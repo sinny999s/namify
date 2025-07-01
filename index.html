@@ -4,11 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Namify BETA</title>
+    <!-- Google Fonts - Poppins for a modern, clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* General Body Styling */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #1e3c72, #2a5298);
+            font-family: 'Poppins', sans-serif; /* Changed font to Poppins */
+            background-color: #0a0a2a; /* Dark blue base for space */
+            /* Starry pattern */
+            background-image:
+                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 25px),
+                radial-gradient(white, rgba(255,255,255,.05) 1px, transparent 20px),
+                radial-gradient(white, rgba(255,255,255,.12) 1px, transparent 35px);
+            background-size:
+                500px 500px,
+                300px 300px,
+                400px 400px,
+                200px 200px,
+                600px 600px; /* Varied sizes for more randomness */
+            background-position:
+                0 0,
+                40px 60px,
+                130px 270px,
+                70px 180px,
+                200px 400px; /* Adjust positions for a scattered effect */
+            animation: moveStars 100s linear infinite; /* Subtle star movement */
+
             color: white;
             display: flex;
             flex-direction: column;
@@ -20,53 +43,162 @@
             position: relative; /* Needed for absolute positioning of children */
         }
 
+        /* Keyframe animation for subtle star movement */
+        @keyframes moveStars {
+            from {
+                background-position: 0 0, 40px 60px, 130px 270px, 70px 180px, 200px 400px;
+            }
+            to {
+                background-position: 500px 500px, 340px 360px, 630px 770px, 370px 480px, 800px 900px;
+            }
+        }
+
+        /* Keyframe animation for chroma RGB effect on buttons */
+        @keyframes chromaShift {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
         /* Common Styles for H2 */
         h2 {
             margin-bottom: 20px;
-            font-size: 32px;
+            font-size: 3.5em; /* Larger heading */
+            font-weight: 700; /* Bolder font */
+            letter-spacing: 2px; /* Spacing for impact */
+            text-shadow: 0 0 15px rgba(255,255,255,0.5); /* Glowing effect */
         }
 
         /* Common Styles for Input Field */
         input {
-            padding: 10px;
-            font-size: 16px;
-            width: 300px;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            padding: 15px 20px; /* Increased padding */
+            font-size: 1.1em; /* Slightly larger font */
+            width: 350px; /* Increased width */
+            border: 2px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+            border-radius: 10px; /* More rounded corners */
+            margin-bottom: 20px; /* Increased margin */
             outline: none;
+            background-color: rgba(255, 255, 255, 0.05); /* Slightly transparent background */
+            color: white;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+        }
+
+        input:focus {
+            border-color: #00bcd4; /* Cyan border on focus */
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); /* Glowing shadow on focus */
         }
 
         /* Common Styles for Buttons */
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #ffffff;
-            color: #2a5298;
+            padding: 15px 30px; /* Increased padding */
+            font-size: 1.1em; /* Slightly larger font */
+            font-weight: 600; /* Bolder text */
+            background-color: #ffffff; /* Default white background */
+            color: #1e3c72; /* Darker blue text for contrast */
             border: none;
-            border-radius: 5px;
+            border-radius: 10px; /* More rounded corners */
             cursor: pointer;
-            transition: background-color 0.3s ease; /* Smooth hover effect */
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+            letter-spacing: 0.5px;
         }
 
         button:hover {
-            background-color: #f0f0f0;
+            background-color: #ffffff; /* Keep white background for filter to work on */
+            animation: chromaShift 2s linear infinite; /* Apply the chroma animation */
+            transform: translateY(-3px) scale(1.02); /* Lift and slightly enlarge on hover */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Enhanced shadow on hover */
+        }
+
+        button:active { /* Added active state for click feedback */
+            transform: translateY(0) scale(0.98); /* Press down effect */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Reduced shadow on press */
         }
 
         /* Styles for the Output Area */
         #output {
-            margin-top: 20px;
-            width: 80%;
-            max-width: 500px; /* Limit width for better readability */
-            max-height: 300px;
+            margin-top: 30px; /* More margin */
+            width: 90%; /* Wider output area */
+            max-width: 600px; /* Increased max width */
+            max-height: 350px; /* Increased max height */
             overflow-y: auto;
             background-color: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 20px; /* Increased padding */
+            border-radius: 15px; /* More rounded corners */
             white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
-            font-family: monospace;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            font-family: 'Cascadia Code', 'Consolas', monospace; /* More distinct monospace font */
+            font-size: 0.95em; /* Slightly smaller font for code-like output */
+            line-height: 1.6; /* Better line spacing */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            scrollbar-width: thin; /* Firefox scrollbar styling */
+            scrollbar-color: #2a5298 rgba(255, 255, 255, 0.1); /* Firefox scrollbar styling */
         }
+
+        /* Webkit (Chrome, Safari) scrollbar styling */
+        #output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #output::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background-color: #2a5298;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Container for output and copy button */
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px; /* Match output max-width */
+        }
+
+        .copy-button-wrapper {
+            margin-top: 15px; /* Space between output and copy button */
+            position: relative; /* For tooltip positioning */
+        }
+
+        .copy-button-wrapper button {
+            padding: 10px 20px; /* Smaller padding for copy button */
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #1e3c72;
+            background-color: #ffffff;
+        }
+
+        /* Copy confirmation message (tooltip) */
+        .copy-message {
+            position: absolute;
+            bottom: calc(100% + 10px); /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 20; /* Ensure it's on top */
+        }
+
+        .copy-message.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
 
         /* --- Welcome Screen Specific Styles --- */
         #welcomeScreen {
@@ -81,27 +213,50 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(to right, #1e3c72, #2a5298); /* Match body background */
+            /* Match body background for seamless transition */
+            background-color: #0a0a2a;
+            background-image:
+                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 25px),
+                radial-gradient(white, rgba(255,255,255,.05) 1px, transparent 20px),
+                radial-gradient(white, rgba(255,255,255,.12) 1px, transparent 35px);
+            background-size:
+                500px 500px,
+                300px 300px,
+                400px 400px,
+                200px 200px,
+                600px 600px;
+            background-position:
+                0 0,
+                40px 60px,
+                130px 270px,
+                70px 180px,
+                200px 400px;
+            animation: moveStars 100s linear infinite; /* Apply same star movement */
             z-index: 10; /* Ensure it's on top initially */
         }
 
         #welcomeScreen h1 {
-            font-size: 48px;
+            font-size: 4.5em; /* Larger welcome heading */
             margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add text shadow */
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.7); /* Stronger glow */
         }
 
         #welcomeScreen p {
-            font-size: 20px;
-            margin-bottom: 40px;
-            max-width: 600px; /* Limit paragraph width */
-            line-height: 1.5;
+            font-size: 1.4em; /* Larger welcome text */
+            margin-bottom: 50px; /* More space before button */
+            max-width: 700px; /* Wider paragraph */
+            line-height: 1.6;
+            font-weight: 300; /* Lighter font weight */
         }
 
         #welcomeScreen button {
-            padding: 15px 30px;
-            font-size: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add button shadow */
+            padding: 20px 40px; /* Larger button */
+            font-size: 1.5em; /* Larger font */
+            font-weight: 700; /* Bolder font */
         }
 
         /* --- Main Application Specific Styles --- */
@@ -126,6 +281,57 @@
             pointer-events: all; /* Enable interactions */
             z-index: 11; /* Bring to front after welcome screen fades */
         }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 2.5em;
+            }
+            input {
+                width: 80%;
+                font-size: 1em;
+                padding: 12px 15px;
+            }
+            button {
+                font-size: 1em;
+                padding: 12px 25px;
+            }
+            #output {
+                width: 95%;
+                padding: 15px;
+                font-size: 0.9em;
+            }
+            #welcomeScreen h1 {
+                font-size: 3em;
+            }
+            #welcomeScreen p {
+                font-size: 1.1em;
+                max-width: 90%;
+            }
+            #welcomeScreen button {
+                font-size: 1.2em;
+                padding: 15px 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 2em;
+            }
+            input {
+                width: 90%;
+            }
+            #welcomeScreen h1 {
+                font-size: 2.2em;
+            }
+            #welcomeScreen p {
+                font-size: 0.9em;
+            }
+            #welcomeScreen button {
+                font-size: 1em;
+                padding: 12px 25px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -133,16 +339,23 @@
     <!-- Welcome Screen Section -->
     <div id="welcomeScreen">
         <h1>Welcome to Namify BETA!</h1>
-        <p>Your go-to tool for generating unique username variations using homoglyphs. Discover creative and secure alternatives for your online presence.</p>
-        <button onclick="startApp()">Get Started</button>
+        <p>Namify helps you instantly generate sleek, timeless usernames. One click, countless clean variations. No clutter. No compromise.</p>
+        <button onclick="startApp()" aria-label="Get Started with Namify Beta">Get Started</button>
     </div>
 
     <!-- Main Application Section (Initially Hidden) -->
     <div id="mainApp">
         <h2>Namify BETA</h2>
-        <input type="text" id="usernameInput" placeholder="Enter username...">
-        <button onclick="generateHomoglyphs()">Generate Variations</button>
-        <div id="output"></div>
+        <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations">
+        <button onclick="generateHomoglyphs()" aria-label="Generate Username Variations">Generate Variations</button>
+        
+        <div class="output-container">
+            <div id="output"></div>
+            <div class="copy-button-wrapper">
+                <button id="copyButton" onclick="copyOutput()" aria-label="Copy generated variations to clipboard">Copy All</button>
+                <span id="copyMessage" class="copy-message">Copied!</span>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -165,8 +378,12 @@
          */
         function generateHomoglyphs() {
             const input = document.getElementById('usernameInput').value;
+            const outputDiv = document.getElementById('output');
+            const copyButton = document.getElementById('copyButton');
+
             if (!input) {
-                document.getElementById('output').innerHTML = "Please enter a username to generate variations.";
+                outputDiv.innerHTML = "Please enter a username to generate variations.";
+                copyButton.style.display = 'none'; // Hide copy button if no input
                 return; // Exit if input is empty
             }
 
@@ -197,11 +414,40 @@
             // Filter out the original input from the results to only show variations
             const filtered = results.filter(v => v !== input);
 
-            const outputDiv = document.getElementById('output');
             if (filtered.length > 0) {
                 outputDiv.innerHTML = `<strong>${filtered.length} Variations Found:</strong>\n\n` + filtered.join('\n');
+                copyButton.style.display = 'block'; // Show copy button if variations are found
             } else {
                 outputDiv.innerHTML = "No homoglyph variations found for the given username.";
+                copyButton.style.display = 'none'; // Hide copy button if no variations
+            }
+        }
+
+        /**
+         * Copies the content of the output div to the clipboard.
+         * Provides visual feedback to the user.
+         */
+        function copyOutput() {
+            const outputText = document.getElementById('output').innerText;
+            const copyMessage = document.getElementById('copyMessage');
+
+            // Use document.execCommand('copy') for clipboard operations in iframes
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = outputText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 1500); // Hide message after 1.5 seconds
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                // Fallback for browsers where execCommand might not work
+                // In a production environment, you might offer a manual copy instruction here.
+            } finally {
+                document.body.removeChild(tempTextArea);
             }
         }
 
@@ -226,8 +472,10 @@
             }, 500); // Duration matches the CSS transition time (0.5s)
         }
 
-        // mainApp is initially hidden by opacity: 0 and pointer-events: none in CSS
-        // No need for DOMContentLoaded listener to hide mainApp with display: none
+        // Initially hide the copy button
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('copyButton').style.display = 'none';
+        });
     </script>
 </body>
 </html>
