@@ -282,6 +282,29 @@
             z-index: 11; /* Bring to front after welcome screen fades */
         }
 
+        /* Footer text styling */
+        .footer-text {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 12; /* Ensure it's above other elements */
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
+        /* Version number styling */
+        .version-text {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.6);
+            z-index: 12; /* Ensure it's above other elements */
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
+
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             h2 {
@@ -311,6 +334,16 @@
             #welcomeScreen button {
                 font-size: 1.2em;
                 padding: 15px 30px;
+            }
+            .footer-text {
+                font-size: 0.75em;
+                bottom: 10px;
+                right: 10px;
+            }
+            .version-text {
+                font-size: 0.75em;
+                top: 10px;
+                left: 10px;
             }
         }
 
@@ -346,7 +379,7 @@
     <!-- Main Application Section (Initially Hidden) -->
     <div id="mainApp">
         <h2>Namify BETA</h2>
-        <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations">
+        <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
         <button onclick="generateHomoglyphs()" aria-label="Generate Username Variations">Generate Variations</button>
         
         <div class="output-container">
@@ -355,6 +388,16 @@
                 <button id="copyButton" onclick="copyOutput()" aria-label="Copy generated variations to clipboard">Copy All</button>
                 <span id="copyMessage" class="copy-message">Copied!</span>
             </div>
+        </div>
+
+        <!-- Footer text -->
+        <div class="footer-text">
+            @Kfzv and @fuckpanpan on Discord
+        </div>
+
+        <!-- Version number text -->
+        <div class="version-text">
+            V0.02
         </div>
     </div>
 
@@ -381,6 +424,24 @@
             const outputDiv = document.getElementById('output');
             const copyButton = document.getElementById('copyButton');
 
+            // Convert input to lowercase for consistent checking
+            const normalizedInput = input.toLowerCase();
+
+            // Easter Egg 1: PanPan
+            if (normalizedInput === "panpan") {
+                outputDiv.innerHTML = "Snowy's mom aint got no teeth so you know its slippin";
+                copyButton.style.display = 'block'; // Show copy button for this message
+                return; // Stop further processing
+            }
+
+            // Easter Egg 2: Sinny
+            if (normalizedInput === "sinny") {
+                outputDiv.innerHTML = "You Typed This Name Because You Know You Love Me";
+                copyButton.style.display = 'block'; // Show copy button for this message
+                return; // Stop further processing
+            }
+
+            // Original homoglyph generation logic
             if (!input) {
                 outputDiv.innerHTML = "Please enter a username to generate variations.";
                 copyButton.style.display = 'none'; // Hide copy button if no input
