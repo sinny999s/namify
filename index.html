@@ -637,6 +637,27 @@
             line-height: 1.4;
         }
 
+        /* New button for Epic Games link */
+        #createEpicAccountButton {
+            margin-top: 25px; /* Space from generated details */
+            padding: 12px 25px;
+            font-size: 1em;
+            background-color: #00bcd4; /* Cyan color for Epic Games button */
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 188, 212, 0.4);
+        }
+
+        #createEpicAccountButton:hover {
+            background-color: #00aabf; /* Slightly darker cyan on hover */
+            animation: none; /* Disable chroma shift for this button if it's a direct link */
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 10px rgba(0, 188, 212, 0.5);
+        }
+        #createEpicAccountButton:active {
+            transform: translateY(0) scale(0.99);
+            box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3);
+        }
+
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -724,6 +745,10 @@
             #makeAccountModal .disclaimer-text {
                 font-size: 0.7em;
             }
+            #createEpicAccountButton {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -787,7 +812,7 @@
 
         <!-- Version number text -->
         <div class="version-text">
-            V0.03
+            V0.04
         </div>
 
         <!-- Updates button -->
@@ -800,15 +825,28 @@
             <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
             <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.04 -->
+                <div class="update-item">
+                    <h4>V0.04 - The Galactic Polish & Security Update!</h4>
+                    <p>
+                        Behold, Namify BETA has ascended to V0.04! We've meticulously polished every cosmic pixel, ensuring a smoother, more intuitive journey through the username galaxy.
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Hyper-Randomized Email Generation:** Our email generator now taps into the quantum realm, producing truly unique and unpredictable email prefixes. No two generated emails will ever be alike, guaranteeing peak digital anonymity (for simulation purposes, of course!).</li>
+                            <li>**Fortress-Grade Password Protocol:** Passwords are now a formidable 15 characters, meticulously crafted to meet universal security standards. Expect a robust blend of uppercase, lowercase, numbers, and special characters – a digital impenetrable shield!</li>
+                            <li>**Seamless Account Creation Gateway:** A direct portal to Epic Games registration has been integrated into the "Make Account Details" modal. Generate your details, then warp directly to account creation!</li>
+                            <li>**Refined Focus Management:** We've fine-tuned the modal interactions, ensuring your focus effortlessly glides back to the correct element after closing pop-up messages. No more getting lost in the digital void!</li>
+                            <li>**Whispers from the Void (Minor Bug Fixes):** Our cosmic janitors have swept away several tiny, lingering anomalies, enhancing overall stability and responsiveness across all dimensions.</li>
+                        </ul>
+                        Prepare for an even more stellar Namify experience!
+                    </p>
+                </div>
                 <!-- Update V0.03 -->
                 <div class="update-item">
-                    <h4>V0.03</h4>
+                    <h4>V0.03 - The Initial UI/UX Overhaul & Account Feature Introduction</h4>
                     <p>
-                        Significant UI/UX enhancements, including dynamic background animations and improved button feedback.
-                        Implemented advanced homoglyph generation logic to support uppercase characters and a wider range of unicode letters.
-                        Introduced a new "Make Account" feature with secure, randomized email and 15-character password generation.
-                        Added character counter for input field and refined overall text presentation for better readability.
-                        Squashed several minor bugs related to modal interactions and responsiveness.
+                        This version marked a significant leap forward! We introduced a completely revamped user interface, with dynamic background animations and improved button feedback to make your experience more engaging. The homoglyph generation logic was enhanced to support uppercase characters and a broader spectrum of unicode letters, expanding your creative possibilities. Crucially, the "Make Account" feature was first introduced, providing simulated secure email and password generation, along with initial text changes for clarity.
                     </p>
                 </div>
                 <!-- Update V0.02 -->
@@ -853,6 +891,10 @@
                     <input type="text" id="modalGeneratedPassword" readonly placeholder="Password will appear here">
                 </div>
             </div>
+
+            <button id="createEpicAccountButton" onclick="window.open('https://www.epicgames.com/id/register/date-of-birth', '_blank')" aria-label="Go to Epic Games registration page">
+                Create Account on Epic Games
+            </button>
 
             <p class="disclaimer-text">
                 Note: This "Generate Account Details" feature is a simulation and does not create a real account or email. It demonstrates how you would integrate with a backend API. To customize, simply replace the @example domain with a well-known email provider like @gmail.com or @outlook.com.
