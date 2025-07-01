@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Namify BETA</title>
+    <!-- Google Fonts - Poppins for a modern, clean look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* General Body Styling */
@@ -576,6 +577,19 @@
             'i': ['i', 'і']  // Latin 'i' vs Cyrillic dotted 'і'
         };
 
+        // Mapping for lowercase Cyrillic to their uppercase equivalents
+        const cyrillicUppercaseMap = {
+            'а': 'А',
+            'е': 'Е',
+            'о': 'О',
+            'с': 'С',
+            'р': 'Р',
+            'х': 'Х',
+            'у': 'У',
+            'ѕ': 'Ѕ',
+            'і': 'І'
+        };
+
         /**
          * Generates homoglyph variations of the input username.
          * Displays the results in the #output div.
@@ -585,7 +599,7 @@
             const outputDiv = document.getElementById('output');
             const copyButton = document.getElementById('copyButton');
 
-            // Convert input to lowercase for consistent checking
+            // Convert input to lowercase for consistent checking of easter eggs
             const normalizedInput = input.toLowerCase();
 
             // Easter Egg 1: PanPan
@@ -621,13 +635,19 @@
                 // Combine existing results with new variants
                 for (let base of results) {
                     for (let variant of variantsForChar) {
+                        let finalVariant = variant; // Default to the variant as is
+
                         // Check if the original character was uppercase AND it's an alphabetic character
-                        // AND the variant itself is an alphabetic character (to avoid uppercasing numbers/symbols)
-                        if (char === char.toUpperCase() && char !== char.toLowerCase() && variant.toLowerCase() !== variant.toUpperCase()) {
-                            temp.push(base + variant.toUpperCase());
-                        } else {
-                            temp.push(base + variant);
+                        if (char === char.toUpperCase() && char !== char.toLowerCase()) {
+                            // If the variant is a known lowercase Cyrillic homoglyph, use its uppercase Cyrillic form
+                            if (cyrillicUppercaseMap[variant]) {
+                                finalVariant = cyrillicUppercaseMap[variant];
+                            } else {
+                                // Otherwise, just uppercase the variant (for Latin variants or other non-mapped chars)
+                                finalVariant = variant.toUpperCase();
+                            }
                         }
+                        temp.push(base + finalVariant);
                     }
                 }
                 results = temp; // Update results with the new combinations
