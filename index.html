@@ -248,6 +248,7 @@
         /* Individual output item */
         .output-item {
             display: flex;
+            flex-wrap: wrap; /* Allow items to wrap */
             justify-content: space-between;
             align-items: center;
             padding: 8px 0;
@@ -266,7 +267,19 @@
         .output-item .output-buttons {
             display: flex;
             gap: 5px; /* Space between copy and make account buttons */
+            margin-top: 5px; /* Space from username if wrapped */
+            width: 100%; /* Take full width on smaller screens */
+            justify-content: flex-end; /* Align buttons to the right */
         }
+
+        @media (min-width: 480px) { /* Adjust for larger screens */
+            .output-item .output-buttons {
+                width: auto; /* Auto width on larger screens */
+                margin-top: 0;
+                justify-content: initial; /* Reset alignment */
+            }
+        }
+
 
         .output-item .copy-individual-button,
         .output-item .make-account-button { /* Apply common styles to both buttons */
@@ -472,7 +485,39 @@
             color: #ffffff;
         }
 
-        /* Modal Overlay (used for both Updates and Make Account modals) */
+        /* Chatbot button styling */
+        .chatbot-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 18px; /* Adjusted padding for icon and text */
+            font-size: 1.2em; /* Larger icon/text */
+            background-color: #4CAF50; /* Green for chat */
+            color: white;
+            border-radius: 50%; /* Make it round */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px; /* Fixed width for round button */
+            height: 50px; /* Fixed height for round button */
+        }
+
+        .chatbot-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .chatbot-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+
+        /* Modal Overlay (used for all modals) */
         .modal-overlay {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
@@ -496,7 +541,7 @@
             visibility: visible;
         }
 
-        /* Modal Content Box (used for both Updates and Make Account modals) */
+        /* Modal Content Box (used for all modals) */
         .modal-content {
             background-color: #0a0a2a; /* Dark background matching body */
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -658,6 +703,82 @@
             box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3);
         }
 
+        /* Chatbot Modal Specific Styles */
+        #chatbotModal .modal-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 70vh; /* Make chat modal taller */
+            max-height: 80vh;
+            padding-bottom: 10px; /* Adjust padding for input area */
+        }
+
+        #chatHistory {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user {
+            background-color: #007bff; /* Blue for user messages */
+            align-self: flex-end;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-message.gemini {
+            background-color: #28a745; /* Green for Gemini messages */
+            align-self: flex-start;
+            color: white;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 0 10px; /* Padding to align with chat history */
+        }
+
+        #chatInput {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+
+        #chatInput::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #sendChatButton {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #00bcd4; /* Cyan send button */
+            color: white;
+            border-radius: 8px;
+            box-shadow: none; /* No extra shadow */
+        }
+
+        #sendChatButton .spinner {
+            margin-left: 5px;
+        }
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -709,6 +830,13 @@
                 left: 10px;
                 padding: 3px 8px;
             }
+            .chatbot-button {
+                bottom: 15px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 1em;
+            }
             .modal-content {
                 padding: 20px;
             }
@@ -749,6 +877,17 @@
                 padding: 10px 20px;
                 font-size: 0.9em;
             }
+            #chatbotModal .modal-content {
+                height: 75vh;
+            }
+            #chatInput {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+            #sendChatButton {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -767,6 +906,13 @@
             #welcomeScreen button {
                 font-size: 1em;
                 padding: 12px 25px;
+            }
+            .chatbot-button {
+                bottom: 10px;
+                left: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -812,11 +958,16 @@
 
         <!-- Version number text -->
         <div class="version-text">
-            V0.04
+            V0.05
         </div>
 
         <!-- Updates button -->
         <button class="updates-button" onclick="openUpdatesModal()" aria-label="View application updates history">Updates?</button>
+
+        <!-- Chatbot button -->
+        <button class="chatbot-button" onclick="openChatbotModal()" aria-label="Open chatbot to chat with Gemini">
+            ✨
+        </button>
     </div>
 
     <!-- Updates Modal -->
@@ -825,6 +976,22 @@
             <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
             <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.05 -->
+                <div class="update-item">
+                    <h4>V0.05 - The Conversational Companion Update!</h4>
+                    <p>
+                        Namify BETA just got a whole lot smarter! We've integrated a powerful new feature to enhance your naming journey.
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Gemini Chatbot Integration:** Say hello to your new AI companion! A sparkling "✨" button in the bottom-left corner now opens a dedicated chat modal, allowing you to converse directly with the Gemini LLM. Ask it anything, from naming advice to existential questions about homoglyphs!</li>
+                            <li>**Streamlined Output Interface:** To make room for our brilliant new chatbot, we've removed the individual "Get Lore" buttons from each username. Don't worry, the spirit of lore lives on within the chatbot!</li>
+                            <li>**Enhanced Responsiveness:** Further optimizations for seamless performance across all devices, ensuring your experience is as smooth as a freshly generated username.</li>
+                            <li>**Invisible Pixie Dust (Minor Bug Fixes):** Our diligent developers have sprinkled magical pixie dust to eliminate various microscopic glitches, ensuring a more stable and enchanting user experience.</li>
+                        </ul>
+                        We're constantly evolving to bring you the best username generation experience in the known universe!
+                    </p>
+                </div>
                 <!-- Update V0.04 -->
                 <div class="update-item">
                     <h4>V0.04 - The Galactic Polish & Security Update!</h4>
@@ -836,6 +1003,7 @@
                             <li>**Hyper-Randomized Email Generation:** Our email generator now taps into the quantum realm, producing truly unique and unpredictable email prefixes. No two generated emails will ever be alike, guaranteeing peak digital anonymity (for simulation purposes, of course!).</li>
                             <li>**Fortress-Grade Password Protocol:** Passwords are now a formidable 15 characters, meticulously crafted to meet universal security standards. Expect a robust blend of uppercase, lowercase, numbers, and special characters – a digital impenetrable shield!</li>
                             <li>**Seamless Account Creation Gateway:** A direct portal to Epic Games registration has been integrated into the "Make Account Details" modal. Generate your details, then warp directly to account creation!</li>
+                            <li>**Lore Weaver (AI-Powered):** Introducing the mystical "✨ Get Lore" button! Our advanced AI now weaves a unique, fantastical origin story for each generated username, adding a layer of depth and intrigue to your digital identity.</li>
                             <li>**Refined Focus Management:** We've fine-tuned the modal interactions, ensuring your focus effortlessly glides back to the correct element after closing pop-up messages. No more getting lost in the digital void!</li>
                             <li>**Whispers from the Void (Minor Bug Fixes):** Our cosmic janitors have swept away several tiny, lingering anomalies, enhancing overall stability and responsiveness across all dimensions.</li>
                         </ul>
@@ -910,6 +1078,24 @@
         </div>
     </div>
 
+    <!-- Chatbot Modal -->
+    <div id="chatbotModal" class="modal-overlay">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="chatbotModalTitle">
+            <span class="close-button" onclick="closeChatbotModal()" aria-label="Close chatbot">&times;</span>
+            <h3 id="chatbotModalTitle">Chat with Gemini</h3>
+            <div id="chatHistory">
+                <div class="chat-message gemini">Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!</div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Type your message..." aria-label="Type your message to Gemini">
+                <button id="sendChatButton" onclick="sendMessageToGemini()">
+                    Send
+                    <span class="spinner" id="chatSpinner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Define homoglyph mappings
         const homoglyphs = {
@@ -938,6 +1124,7 @@
         };
 
         let lastFocusedElement = null; // To store the element that had focus before modal opened
+        let chatHistory = [{ role: "model", parts: [{ text: "Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!" }] }]; // Initialize chat history
 
         /**
          * Generates a random alphanumeric string of a given length.
@@ -1396,6 +1583,97 @@
             }
         }
 
+        /**
+         * Opens the chatbot modal.
+         */
+        function openChatbotModal() {
+            openModal('chatbotModal', document.getElementById('chatInput'));
+            // Scroll to the bottom of the chat history when opened
+            const chatHistoryDiv = document.getElementById('chatHistory');
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+        }
+
+        /**
+         * Closes the chatbot modal.
+         */
+        function closeChatbotModal() {
+            closeModal('chatbotModal');
+        }
+
+        /**
+         * Sends a message to the Gemini API and displays the response.
+         */
+        async function sendMessageToGemini() {
+            const chatInput = document.getElementById('chatInput');
+            const chatHistoryDiv = document.getElementById('chatHistory');
+            const sendButton = document.getElementById('sendChatButton');
+            const chatSpinner = document.getElementById('chatSpinner');
+
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            // Display user message
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'chat-message user';
+            userMessageDiv.textContent = userMessage;
+            chatHistoryDiv.appendChild(userMessageDiv);
+
+            // Add to chat history for context
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+            // Clear input and show loading
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            chatSpinner.style.display = 'block';
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom
+
+            try {
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide this
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                let geminiResponseText = "Sorry, I couldn't get a response. Please try again.";
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    geminiResponseText = result.candidates[0].content.parts[0].text;
+                }
+
+                // Display Gemini's response
+                const geminiMessageDiv = document.createElement('div');
+                geminiMessageDiv.className = 'chat-message gemini';
+                geminiMessageDiv.textContent = geminiResponseText;
+                chatHistoryDiv.appendChild(geminiMessageDiv);
+
+                // Add to chat history for context
+                chatHistory.push({ role: "model", parts: [{ text: geminiResponseText }] });
+
+            } catch (error) {
+                console.error('Error communicating with Gemini API:', error);
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'chat-message gemini';
+                errorMessageDiv.textContent = "Oops! Something went wrong. Please try sending your message again.";
+                chatHistoryDiv.appendChild(errorMessageDiv);
+            } finally {
+                // Hide loading and re-enable input
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatSpinner.style.display = 'none';
+                chatInput.focus(); // Return focus to input
+                chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom again
+            }
+        }
+
+
         // Event listeners for input field UI updates
         document.addEventListener('DOMContentLoaded', () => {
             const usernameInput = document.getElementById('usernameInput');
@@ -1404,6 +1682,13 @@
 
             // Initially hide the "Copy All" button
             document.getElementById('copyAllButton').style.display = 'none';
+
+            // Event listener for sending chat message on Enter key press
+            document.getElementById('chatInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessageToGemini();
+                }
+            });
         });
     </script>
 </body>
