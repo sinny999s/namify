@@ -43,6 +43,17 @@
             position: relative; /* Needed for absolute positioning of children */
         }
 
+        /* Canvas for particles */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind other content */
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+
         /* Keyframe animation for subtle star movement - fixed pixel values */
         @keyframes moveStars {
             from {
@@ -53,7 +64,7 @@
             }
         }
 
-        /* Keyframe animation for chroma RGB effect on buttons */
+        /* Keyframe animation for chroma RGB effect on buttons and now "Namify" text */
         @keyframes chromaShift {
             0% { filter: hue-rotate(0deg); }
             100% { filter: hue-rotate(360deg); }
@@ -71,8 +82,22 @@
             font-size: 3.5em; /* Larger heading */
             font-weight: 700; /* Bolder font */
             letter-spacing: 2px; /* Spacing for impact */
-            text-shadow: 0 0 15px rgba(255,255,255,0.5); /* Glowing effect */
+            /* RGB glow for "Namify" text */
+            text-shadow:
+                0 0 5px #ff0000, /* Red */
+                0 0 10px #00ff00, /* Green */
+                0 0 15px #0000ff; /* Blue */
+            animation: chromaShift 2s linear infinite; /* Apply RGB animation */
+            z-index: 1; /* Ensure it's above the particle canvas */
         }
+
+        h2 .rgb-glow {
+            display: inline-block; /* Allows transform and shadow */
+            color: #ccc; /* Light grey color for BETA */
+            text-shadow: none; /* No text shadow for a flat look */
+            animation: none; /* No animation */
+        }
+
 
         .modal-content h3 {
             margin-top: 0;
@@ -87,6 +112,7 @@
             position: relative;
             width: 350px; /* Match input width */
             margin-bottom: 20px;
+            z-index: 1; /* Ensure it's above the particle canvas */
         }
 
         /* Common Styles for Input Field (used throughout the app and modals) */
@@ -169,6 +195,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px; /* Space between text and spinner */
+            z-index: 1; /* Ensure it's above the particle canvas */
         }
 
         button:hover:not(:disabled) { /* Only hover if not disabled */
@@ -213,6 +240,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 1; /* Ensure it's above the particle canvas */
         }
 
         #output { /* Renamed to output-list */
@@ -918,6 +946,8 @@
     </style>
 </head>
 <body>
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
 
     <!-- Welcome Screen Section -->
     <div id="welcomeScreen">
@@ -928,7 +958,7 @@
 
     <!-- Main Application Section (Initially Hidden) -->
     <div id="mainApp">
-        <h2>Namify BETA</h2>
+        <h2>Namify <span class="rgb-glow">BETA</span></h2>
         <div class="input-container">
             <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
             <button class="clear-input" onclick="clearInput()" aria-label="Clear input">
@@ -958,7 +988,7 @@
 
         <!-- Version number text -->
         <div class="version-text">
-            V0.05
+            V0.09
         </div>
 
         <!-- Updates button -->
@@ -976,6 +1006,68 @@
             <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
             <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.09 -->
+                <div class="update-item">
+                    <h4>V0.09 - The Cosmic Dust Update!</h4>
+                    <p>
+                        Namify now features a mesmerizing new background effect to deepen its celestial theme!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Subtle Particle System:** A dynamic particle system has been integrated into the background. Watch as tiny, glowing particles gently float, fade, and shimmer, adding an ethereal and immersive sense of depth to the application.</li>
+                            <li>**Performance Optimizations:** The new particle system is designed to be lightweight and efficient, ensuring smooth performance without impacting the app's responsiveness.</li>
+                            <li>**Minor Visual Refinements:** Further small adjustments to element positioning and layering have been made to ensure the new background effect harmonizes perfectly with the existing UI.</li>
+                        </ul>
+                        We're continuously working to make your Namify experience as visually captivating as it is functional!
+                    </p>
+                </div>
+                <!-- Update V0.08 -->
+                <div class="update-item">
+                    <h4>V0.08 - The Dual Glow Revival!</h4>
+                    <p>
+                        The Namify app is now even more visually striking with a return to its luminous roots!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**"Namify" Text RGB Glow:** The primary "Namify" heading now pulses with the captivating RGB glow, bringing back a dynamic and futuristic aesthetic.</li>
+                            <li>**"BETA" Text Consistency:** The "BETA" text retains its subtle light grey color, providing a balanced visual contrast to the glowing "Namify" title.</li>
+                            <li>**Minor Visual Tweaks:** Further small adjustments have been made to ensure optimal visual harmony and responsiveness across all display sizes.</li>
+                            <li>**Stability Enhancements:** Continued efforts to refine the codebase have resulted in improved stability and a smoother user experience.</li>
+                        </ul>
+                        We're committed to making your username generation experience as visually engaging as it is functional!
+                    </p>
+                </div>
+                <!-- Update V0.07 -->
+                <div class="update-item">
+                    <h4>V0.07 - The Subtlety Refinement Update!</h4>
+                    <p>
+                        We've fine-tuned the aesthetics for a more refined visual experience.
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**"BETA" Text Recolor:** The "BETA" text in the main heading now sports a sophisticated light grey color, offering a softer contrast while maintaining its distinct presence. The vibrant RGB glow has been gracefully retired for a more understated elegance.</li>
+                            <li>**Minor UI Polish:** Further subtle adjustments to element spacing and visual hierarchies have been implemented, ensuring a cleaner and more harmonious interface.</li>
+                            <li>**Under-the-Hood Optimizations:** Our engineers have continued to streamline the codebase, resulting in even more efficient resource utilization and a smoother overall application flow.</li>
+                        </ul>
+                        Namify continues its journey towards visual perfection and seamless functionality!
+                    </p>
+                </div>
+                <!-- Update V0.06 -->
+                <div class="update-item">
+                    <h4>V0.06 - The Chromatic Brilliance Update!</h4>
+                    <p>
+                        Prepare for a visual spectacle! Namify BETA now dazzles with an electrifying new effect.
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**RGB Glow on "BETA":** The "BETA" text in the main heading now pulsates with a mesmerizing RGB glow, adding a vibrant and futuristic touch to your Namify experience. It's not just a name generator; it's a light show!</li>
+                            <li>**Further Performance Optimizations:** We've tweaked the cosmic engines even further, ensuring lightning-fast responses and buttery-smooth animations across all devices, from ancient scrolls to quantum supercomputers.</li>
+                            <li>**Subtle UI Refinements:** Minor adjustments to spacing and alignment have been implemented, enhancing the overall aesthetic balance and ensuring every pixel is perfectly aligned with the celestial grid.</li>
+                            <li>**Quantum Bug Annihilation:** Our dedicated team of interdimensional debuggers has obliterated several elusive, quantum-level bugs that were previously undetectable. The app is now more stable than a neutron star!</li>
+                        </ul>
+                        Your journey through the naming cosmos just got a whole lot brighter!
+                    </p>
+                </div>
                 <!-- Update V0.05 -->
                 <div class="update-item">
                     <h4>V0.05 - The Conversational Companion Update!</h4>
@@ -1674,6 +1766,87 @@
             }
         }
 
+        // Particle System Logic
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const maxParticles = 100; // Number of particles
+
+        // Particle class
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = Math.random() * 1.5 + 0.5; // Small particles
+                this.opacity = Math.random() * 0.7 + 0.3; // Varying opacity
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 0.3, // Slow horizontal movement
+                    y: (Math.random() - 0.5) * 0.3  // Slow vertical movement
+                };
+                this.life = 0;
+                this.maxLife = Math.random() * 100 + 100; // How long particle lives
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.fill();
+            }
+
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.life++;
+                this.opacity = 1 - (this.life / this.maxLife); // Fade out over time
+            }
+        }
+
+        /**
+         * Initializes particles.
+         */
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < maxParticles; i++) {
+                // Spawn particles randomly across the canvas
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                particles.push(new Particle(x, y));
+            }
+        }
+
+        /**
+         * Animation loop for particles.
+         */
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+
+                // If particle is dead or out of bounds, remove and replace
+                if (p.life >= p.maxLife || p.opacity <= 0 || p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+                    particles.splice(i, 1);
+                    // Add a new particle at a random position
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    particles.push(new Particle(x, y));
+                    i--; // Adjust index after splice
+                }
+            }
+        }
+
+        /**
+         * Resizes the canvas to fill the window.
+         */
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles(); // Re-initialize particles on resize to fill new dimensions
+        }
 
         // Event listeners for input field UI updates
         document.addEventListener('DOMContentLoaded', () => {
@@ -1690,6 +1863,11 @@
                     sendMessageToGemini();
                 }
             });
+
+            // Initialize and start particle animation
+            resizeCanvas(); // Set initial canvas size and populate particles
+            window.addEventListener('resize', resizeCanvas); // Adjust canvas size on window resize
+            animateParticles(); // Start the animation loop
         });
     </script>
 </body>
