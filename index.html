@@ -1162,7 +1162,10 @@
          * @param {HTMLElement | null} initialFocusElement - Optional element to focus initially inside the modal.
          */
         function openModal(modalId, initialFocusElement = null) {
-            lastFocusedElement = document.activeElement; // Store currently focused element
+            // Only store last focused element if it's not the message box itself
+            if (modalId !== 'modalAccountMessageBox') {
+                lastFocusedElement = document.activeElement;
+            }
             const modal = document.getElementById(modalId);
             modal.classList.add('active');
 
@@ -1205,8 +1208,8 @@
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.remove('active');
-            // Restore focus to the element that had focus before the modal opened
-            if (lastFocusedElement) {
+            // Restore focus only if this is the modal that originally stored the last focused element
+            if (modalId !== 'modalAccountMessageBox' && lastFocusedElement) {
                 lastFocusedElement.focus();
                 lastFocusedElement = null; // Clear stored element
             }
@@ -1284,24 +1287,66 @@
                 spinner.style.display = 'none';
                 buttonText.textContent = 'Generate Account Details';
 
-                showMessageBox('Account details generated successfully!');
+                // After generating, show message box, but ensure focus returns to generate button
+                showMessageBox('Account details generated successfully!', document.getElementById('generateAccountDetailsButton'));
             }, 1500); // Simulate 1.5 second API call
         }
 
         /**
          * Shows a custom message box.
          * @param {string} message - The message to display.
+         * @param {HTMLElement | null} focusElementOnClose - The element to focus after the message box closes.
          */
-        function showMessageBox(message) {
+        function showMessageBox(message, focusElementOnClose = null) {
             document.getElementById('modalAccountMessageContent').textContent = message;
-            openModal('modalAccountMessageBox', document.getElementById('closeModalAccountMessageBox'));
+            const messageBox = document.getElementById('modalAccountMessageBox');
+            messageBox.classList.add('active');
+            // Store the element to focus on close for this specific message box
+            messageBox.focusElementOnClose = focusElementOnClose;
+
+            // Focus the OK button within the message box
+            const okButton = document.getElementById('closeModalAccountMessageBox');
+            if (okButton) {
+                okButton.focus();
+            }
+
+            // Trap focus within the message box
+            messageBox.addEventListener('keydown', function(e) {
+                const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+
+                if (!isTabPressed) {
+                    return;
+                }
+
+                const focusableElements = messageBox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                const firstFocusableElement = focusableElements[0];
+                const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) { // if shift key pressed for shift + tab
+                    if (document.activeElement === firstFocusableElement) {
+                        lastFocusableElement.focus(); // move focus to the last focusable element
+                        e.preventDefault();
+                    }
+                } else { // if tab key pressed
+                    if (document.activeElement === lastFocusableElement) {
+                        firstFocusableElement.focus(); // move focus to the first focusable element
+                        e.preventDefault();
+                    }
+                }
+            });
         }
 
         /**
-         * Closes the custom message box.
+         * Closes the custom message box and restores focus.
          */
         function closeModalAccountMessageBox() {
-            closeModal('modalAccountMessageBox');
+            const messageBox = document.getElementById('modalAccountMessageBox');
+            messageBox.classList.remove('active');
+            // Restore focus to the element specified when showMessageBox was called
+            if (messageBox.focusElementOnClose) {
+                messageBox.focusElementOnClose.focus();
+                messageBox.focusElementOnClose = null; // Clear the stored element
+            }
         }
 
         // Event listeners for input field UI updates
