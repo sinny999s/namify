@@ -1751,7 +1751,7 @@
          */
         function sendAccountDetailsToExtension(details) {
             // Use a specific message type to avoid conflicts with other messages
-            window.postMessage({
+            window.parent.postMessage({
                 type: 'NAMIFY_ACCOUNT_DETAILS',
                 payload: details
             }, '*'); // '*' allows communication with any origin. For production, specify your extension ID.
