@@ -59,6 +59,12 @@
             100% { filter: hue-rotate(360deg); }
         }
 
+        /* Keyframe for loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Common Styles for H2 */
         h2 {
             margin-bottom: 20px;
@@ -68,14 +74,21 @@
             text-shadow: 0 0 15px rgba(255,255,255,0.5); /* Glowing effect */
         }
 
+        /* Input container for positioning clear button and counter */
+        .input-container {
+            position: relative;
+            width: 350px; /* Match input width */
+            margin-bottom: 20px;
+        }
+
         /* Common Styles for Input Field */
         input {
             padding: 15px 20px; /* Increased padding */
             font-size: 1.1em; /* Slightly larger font */
-            width: 350px; /* Increased width */
+            width: 100%; /* Fill container */
+            box-sizing: border-box; /* Include padding in width */
             border: 2px solid rgba(255, 255, 255, 0.3); /* Subtle border */
             border-radius: 10px; /* More rounded corners */
-            margin-bottom: 20px; /* Increased margin */
             outline: none;
             background-color: rgba(255, 255, 255, 0.05); /* Slightly transparent background */
             color: white;
@@ -91,6 +104,46 @@
             box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); /* Glowing shadow on focus */
         }
 
+        /* Clear input button */
+        .clear-input {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px;
+            display: none; /* Hidden by default */
+            transition: color 0.2s ease; /* Only color transition */
+        }
+
+        .clear-input:hover {
+            color: white;
+            background-color: transparent !important; /* Force no background */
+            border: none !important; /* Force no border */
+            box-shadow: none !important; /* Force no shadow */
+            transform: translateY(-50%) !important; /* Ensure no transform */
+        }
+
+        .clear-input:active {
+            background-color: transparent !important; /* Force no background */
+            border: none !important; /* Force no border */
+            box-shadow: none !important; /* Force no shadow */
+            transform: translateY(-50%) !important; /* Ensure no transform */
+        }
+
+        /* Character counter */
+        .char-counter {
+            position: absolute;
+            bottom: -18px; /* Position below input */
+            right: 5px;
+            font-size: 0.75em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
         /* Common Styles for Buttons */
         button {
             padding: 15px 30px; /* Increased padding */
@@ -101,41 +154,71 @@
             border: none;
             border-radius: 10px; /* More rounded corners */
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* Smooth transitions */
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
             letter-spacing: 0.5px;
+            display: flex; /* For aligning text and spinner */
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between text and spinner */
         }
 
-        button:hover {
+        button:hover:not(:disabled) { /* Only hover if not disabled */
             background-color: #ffffff; /* Keep white background for filter to work on */
             animation: chromaShift 2s linear infinite; /* Apply the chroma animation */
             transform: translateY(-3px) scale(1.02); /* Lift and slightly enlarge on hover */
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Enhanced shadow on hover */
         }
 
-        button:active { /* Added active state for click feedback */
+        button:active:not(:disabled) { /* Only active if not disabled */
             transform: translateY(0) scale(0.98); /* Press down effect */
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Reduced shadow on press */
         }
 
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #00bcd4; /* Cyan spinner */
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
         /* Styles for the Output Area */
-        #output {
+        #output-container-wrapper { /* New wrapper for output and copy all button */
             margin-top: 30px; /* More margin */
             width: 90%; /* Wider output area */
             max-width: 600px; /* Increased max width */
-            max-height: 350px; /* Increased max height */
-            overflow-y: auto;
             background-color: rgba(255, 255, 255, 0.1);
             padding: 20px; /* Increased padding */
             border-radius: 15px; /* More rounded corners */
-            white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #output { /* Renamed to output-list */
+            list-style: none; /* Remove bullet points */
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            max-height: 350px; /* Increased max height */
+            overflow-y: auto; /* Enable scrolling for content */
             font-family: 'Cascadia Code', 'Consolas', monospace; /* More distinct monospace font */
             font-size: 0.95em; /* Slightly smaller font for code-like output */
             line-height: 1.6; /* Better line spacing */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
-            scrollbar-width: thin; /* Firefox scrollbar styling */
-            scrollbar-color: #2a5298 rgba(255, 255, 255, 0.1); /* Firefox scrollbar styling */
+            color: #e0e0e0; /* Lighter text for variations */
+            text-align: left; /* Align text left */
         }
 
         /* Webkit (Chrome, Safari) scrollbar styling */
@@ -154,22 +237,65 @@
             border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Container for output and copy button */
-        .output-container {
+        /* Individual output item */
+        .output-item {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            width: 100%;
-            max-width: 600px; /* Match output max-width */
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle separator */
         }
 
-        .copy-button-wrapper {
-            margin-top: 15px; /* Space between output and copy button */
+        .output-item:last-child {
+            border-bottom: none;
+        }
+
+        .output-item span {
+            flex-grow: 1; /* Allow text to take space */
+            word-break: break-all; /* Break long words */
+        }
+
+        .output-item .copy-individual-button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9em;
+            transition: color 0.2s ease; /* Only color transition */
+            padding: 5px; /* Make clickable area larger */
+        }
+
+        .output-item .copy-individual-button:hover {
+            color: #00bcd4; /* Cyan on hover */
+            background-color: transparent !important; /* Force no background */
+            border: none !important; /* Force no border */
+            box-shadow: none !important; /* Force no shadow */
+            transform: none !important; /* Ensure no transform */
+        }
+
+        .output-item .copy-individual-button:active {
+            background-color: transparent !important; /* Force no background */
+            border: none !important; /* Force no border */
+            box-shadow: none !important; /* Force no shadow */
+            transform: none !important; /* Ensure no transform */
+        }
+
+        /* Message for no variations found */
+        .no-variations-message {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+        }
+
+        .copy-all-button-wrapper { /* Renamed for clarity */
+            margin-top: 15px; /* Space between output and copy all button */
             position: relative; /* For tooltip positioning */
         }
 
-        .copy-button-wrapper button {
-            padding: 10px 20px; /* Smaller padding for copy button */
+        .copy-all-button-wrapper button { /* Styles for the main "Copy All" button */
+            padding: 10px 20px;
             font-size: 0.9em;
             font-weight: 500;
             color: #1e3c72;
@@ -431,8 +557,10 @@
             h2 {
                 font-size: 2.5em;
             }
-            input {
+            .input-container {
                 width: 80%;
+            }
+            input {
                 font-size: 1em;
                 padding: 12px 15px;
             }
@@ -440,9 +568,11 @@
                 font-size: 1em;
                 padding: 12px 25px;
             }
-            #output {
+            #output-container-wrapper {
                 width: 95%;
                 padding: 15px;
+            }
+            #output {
                 font-size: 0.9em;
             }
             #welcomeScreen h1 {
@@ -498,7 +628,7 @@
             h2 {
                 font-size: 2em;
             }
-            input {
+            .input-container {
                 width: 90%;
             }
             #welcomeScreen h1 {
@@ -516,45 +646,69 @@
 </head>
 <body>
 
+    <!-- Welcome Screen Section -->
     <div id="welcomeScreen">
         <h1>Welcome to Namify BETA!</h1>
         <p>Namify helps you instantly generate sleek, timeless usernames. One click, countless clean variations. No clutter. No compromise.</p>
         <button onclick="startApp()" aria-label="Get Started with Namify Beta">Get Started</button>
     </div>
 
+    <!-- Main Application Section (Initially Hidden) -->
     <div id="mainApp">
         <h2>Namify BETA</h2>
-        <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
-        <button onclick="generateHomoglyphs()" aria-label="Generate Username Variations">Generate Variations</button>
+        <div class="input-container">
+            <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
+            <button class="clear-input" onclick="clearInput()" aria-label="Clear input">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
+            </button>
+            <span class="char-counter" id="charCounter">0/16</span>
+        </div>
+        <button id="generateButton" onclick="generateHomoglyphs()" aria-label="Generate Username Variations">
+            Generate Variations
+            <span class="spinner" id="generateSpinner"></span>
+        </button>
         
-        <div class="output-container">
-            <div id="output"></div>
-            <div class="copy-button-wrapper">
-                <button id="copyButton" onclick="copyOutput()" aria-label="Copy generated variations to clipboard">Copy All</button>
+        <div id="output-container-wrapper">
+            <ul id="output"></ul> <!-- Changed to ul for list items -->
+            <div class="copy-all-button-wrapper">
+                <button id="copyAllButton" onclick="copyAllOutput()" aria-label="Copy all generated variations to clipboard">Copy All</button>
                 <span id="copyMessage" class="copy-message">Copied!</span>
             </div>
         </div>
 
+        <!-- Footer text -->
         <div class="footer-text">
             @Kfzv and @fuckpanpan on Discord
         </div>
 
+        <!-- Version number text -->
         <div class="version-text">
-            V0.02
+            V0.03
         </div>
 
+        <!-- Updates button -->
         <button class="updates-button" onclick="openUpdatesModal()" aria-label="View application updates history">Updates?</button>
     </div>
 
+    <!-- Updates Modal -->
     <div id="updatesModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeUpdatesModal()">&times;</span>
-            <h3>Updates History</h3>
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="updatesModalTitle">
+            <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
+            <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.03 -->
+                <div class="update-item">
+                    <h4>V0.03</h4>
+                    <p>New unicode letters coming soon</p>
+                </div>
+                <!-- Update V0.02 -->
                 <div class="update-item">
                     <h4>V0.02</h4>
                     <p>Enhanced UI Design, Welcome Screen, Footer Text, Version Number, Chroma Buttons, 16-Character Limit, Caps-Friendly Generator, Easter Eggs (PanPan, Sinny)</p>
                 </div>
+                <!-- Update V0.01 -->
                 <div class="update-item">
                     <h4>V0.01</h4>
                     <p>Boring ass generator</p>
@@ -590,107 +744,188 @@
             'і': 'І'
         };
 
+        let lastFocusedElement = null; // To store the element that had focus before modal opened
+
+        /**
+         * Updates the character counter and shows/hides the clear button.
+         */
+        function updateInputUI() {
+            const inputElement = document.getElementById('usernameInput');
+            const charCounter = document.getElementById('charCounter');
+            const clearButton = document.querySelector('.clear-input');
+            const maxLength = inputElement.maxLength;
+            const currentLength = inputElement.value.length;
+
+            charCounter.textContent = `${currentLength}/${maxLength}`;
+
+            if (currentLength > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
+        }
+
+        /**
+         * Clears the input field.
+         */
+        function clearInput() {
+            document.getElementById('usernameInput').value = '';
+            updateInputUI(); // Update counter and clear button state
+            document.getElementById('output').innerHTML = ''; // Clear output
+            document.getElementById('copyAllButton').style.display = 'none'; // Hide copy all button
+            // No "Copied!" message needed for clearing input.
+        }
+
+        /**
+         * Copies text to clipboard using document.execCommand.
+         * @param {string} text - The text to copy.
+         * @param {HTMLElement | null} messageElement - The element to show "Copied!" message (optional).
+         */
+        function copyTextToClipboard(text, messageElement = null) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                if (messageElement) {
+                    messageElement.classList.add('show');
+                    setTimeout(() => {
+                        messageElement.classList.remove('show');
+                    }, 1500); // Hide message after 1.5 seconds
+                }
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+
+        /**
+         * Copies all generated variations to the clipboard.
+         */
+        function copyAllOutput() {
+            const outputListItems = document.querySelectorAll('#output .output-item span');
+            if (outputListItems.length === 0) return;
+
+            let allVariationsText = '';
+            outputListItems.forEach(item => {
+                allVariationsText += item.textContent + '\n';
+            });
+
+            copyTextToClipboard(allVariationsText.trim(), document.getElementById('copyMessage'));
+        }
+
+        /**
+         * Copies a single variation to the clipboard.
+         * @param {HTMLElement} buttonElement - The button element that was clicked.
+         */
+        function copyIndividualVariation(buttonElement) {
+            const variationText = buttonElement.previousElementSibling.textContent;
+            // No "Copied!" message needed for individual copy.
+            copyTextToClipboard(variationText);
+        }
+
+
         /**
          * Generates homoglyph variations of the input username.
          * Displays the results in the #output div.
          */
         function generateHomoglyphs() {
-            const input = document.getElementById('usernameInput').value;
-            const outputDiv = document.getElementById('output');
-            const copyButton = document.getElementById('copyButton');
+            const inputElement = document.getElementById('usernameInput');
+            const outputList = document.getElementById('output'); // Changed to outputList
+            const copyAllButton = document.getElementById('copyAllButton');
+            const generateButton = document.getElementById('generateButton');
+            const generateSpinner = document.getElementById('generateSpinner');
 
-            // Convert input to lowercase for consistent checking of easter eggs
+            const input = inputElement.value;
             const normalizedInput = input.toLowerCase();
 
-            // Easter Egg 1: PanPan
-            if (normalizedInput === "panpan") {
-                outputDiv.innerHTML = "Snowy's mom aint got no teeth so you know its slippin";
-                copyButton.style.display = 'block'; // Show copy button for this message
-                return; // Stop further processing
-            }
+            // Show loading state
+            generateButton.disabled = true;
+            generateSpinner.style.display = 'block';
+            outputList.innerHTML = ''; // Clear previous results
+            copyAllButton.style.display = 'none'; // Hide copy all button initially
 
-            // Easter Egg 2: Sinny
-            if (normalizedInput === "sinny") {
-                outputDiv.innerHTML = "You Typed This Name Because You Know You Love Me";
-                copyButton.style.display = 'block'; // Show copy button for this message
-                return; // Stop further processing
-            }
-
-            // Original homoglyph generation logic
-            if (!input) {
-                outputDiv.innerHTML = "Please enter a username to generate variations.";
-                copyButton.style.display = 'none'; // Hide copy button if no input
-                return; // Exit if input is empty
-            }
-
-            let results = ['']; // Initialize with an empty string to build variations
-            // Iterate over each character in the input string
-            for (let char of input) {
-                const lowerChar = char.toLowerCase();
-                // Get possible variants for the current character (based on its lowercase form)
-                // If no homoglyph is defined, use the original character itself
-                let variantsForChar = homoglyphs[lowerChar] || [char];
-
-                let temp = []; // Temporary array to store new combinations
-                // Combine existing results with new variants
-                for (let base of results) {
-                    for (let variant of variantsForChar) {
-                        let finalVariant = variant; // Default to the variant as is
-
-                        // Check if the original character was uppercase AND it's an alphabetic character
-                        if (char === char.toUpperCase() && char !== char.toLowerCase()) {
-                            // If the variant is a known lowercase Cyrillic homoglyph, use its uppercase Cyrillic form
-                            if (cyrillicUppercaseMap[variant]) {
-                                finalVariant = cyrillicUppercaseMap[variant];
-                            } else {
-                                // Otherwise, just uppercase the variant (for Latin variants or other non-mapped chars)
-                                finalVariant = variant.toUpperCase();
-                            }
-                        }
-                        temp.push(base + finalVariant);
-                    }
+            // Simulate a delay for demonstration of loading spinner
+            setTimeout(() => {
+                // Easter Egg 1: PanPan
+                if (normalizedInput === "panpan") {
+                    outputList.innerHTML = `<li class="no-variations-message">Snowy's mom aint got no teeth so you know its slippin</li>`;
+                    copyAllButton.style.display = 'block';
+                    generateButton.disabled = false;
+                    generateSpinner.style.display = 'none';
+                    return;
                 }
-                results = temp; // Update results with the new combinations
-            }
 
-            // Filter out the original input from the results to only show variations
-            const filtered = results.filter(v => v !== input);
+                // Easter Egg 2: Sinny
+                if (normalizedInput === "sinny") {
+                    outputList.innerHTML = `<li class="no-variations-message">You Typed This Name Because You Know You Love Me</li>`;
+                    copyAllButton.style.display = 'block';
+                    generateButton.disabled = false;
+                    generateSpinner.style.display = 'none';
+                    return;
+                }
 
-            if (filtered.length > 0) {
-                outputDiv.innerHTML = `<strong>${filtered.length} Variations Found:</strong>\n\n` + filtered.join('\n');
-                copyButton.style.display = 'block'; // Show copy button if variations are found
-            } else {
-                outputDiv.innerHTML = "No homoglyph variations found for the given username.";
-                copyButton.style.display = 'none'; // Hide copy button if no variations
-            }
-        }
+                // Original homoglyph generation logic
+                if (!input) {
+                    outputList.innerHTML = `<li class="no-variations-message">Please enter a username to generate variations.</li>`;
+                    generateButton.disabled = false;
+                    generateSpinner.style.display = 'none';
+                    return;
+                }
 
-        /**
-         * Copies the content of the output div to the clipboard.
-         * Provides visual feedback to the user.
-         */
-        function copyOutput() {
-            const outputText = document.getElementById('output').innerText;
-            const copyMessage = document.getElementById('copyMessage');
+                let results = [''];
+                for (let char of input) {
+                    const lowerChar = char.toLowerCase();
+                    let variantsForChar = homoglyphs[lowerChar] || [char];
 
-            // Use document.execCommand('copy') for clipboard operations in iframes
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = outputText;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                copyMessage.classList.add('show');
-                setTimeout(() => {
-                    copyMessage.classList.remove('show');
-                }, 1500); // Hide message after 1.5 seconds
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                // Fallback for browsers where execCommand might not work
-                // In a production environment, you might offer a manual copy instruction here.
-            } finally {
-                document.body.removeChild(tempTextArea);
-            }
+                    let temp = [];
+                    for (let base of results) {
+                        for (let variant of variantsForChar) {
+                            let finalVariant = variant;
+                            if (char === char.toUpperCase() && char !== char.toLowerCase()) {
+                                if (cyrillicUppercaseMap[variant]) {
+                                    finalVariant = cyrillicUppercaseMap[variant];
+                                } else {
+                                    finalVariant = variant.toUpperCase();
+                                }
+                            }
+                            temp.push(base + finalVariant);
+                        }
+                    }
+                    results = temp;
+                }
+
+                // Filter out the original input if it exists in results
+                const filtered = results.filter(v => v !== input);
+
+                if (filtered.length > 0) {
+                    // Display results as list items with individual copy buttons
+                    outputList.innerHTML = ``; // Clear before adding new items
+                    filtered.forEach(variation => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'output-item';
+                        listItem.innerHTML = `
+                            <span>${variation}</span>
+                            <button class="copy-individual-button" onclick="copyIndividualVariation(this)" aria-label="Copy ${variation} to clipboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                                </svg>
+                            </button>
+                        `;
+                        outputList.appendChild(listItem);
+                    });
+                    copyAllButton.style.display = 'block'; // Show copy all button
+                } else {
+                    outputList.innerHTML = `<li class="no-variations-message">No homoglyph variations found for "${input}". Try a different name, or one with common letters like 'a', 'e', 'o'.</li>`;
+                    copyAllButton.style.display = 'none'; // Hide copy all button
+                }
+
+                // Hide loading state
+                generateButton.disabled = false;
+                generateSpinner.style.display = 'none';
+            }, 500); // Simulate 0.5 second loading time
         }
 
         /**
@@ -715,22 +950,66 @@
         }
 
         /**
-         * Opens the updates modal.
+         * Opens the updates modal and traps focus.
          */
         function openUpdatesModal() {
-            document.getElementById('updatesModal').classList.add('active');
+            lastFocusedElement = document.activeElement; // Store currently focused element
+            const modal = document.getElementById('updatesModal');
+            modal.classList.add('active');
+
+            // Get all focusable elements inside the modal
+            const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+            // Focus the first element when modal opens
+            if (firstFocusableElement) {
+                firstFocusableElement.focus();
+            }
+
+            // Trap focus within the modal
+            modal.addEventListener('keydown', function(e) {
+                const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+
+                if (!isTabPressed) {
+                    return;
+                }
+
+                if (e.shiftKey) { // if shift key pressed for shift + tab
+                    if (document.activeElement === firstFocusableElement) {
+                        lastFocusableElement.focus(); // move focus to the last focusable element
+                        e.preventDefault();
+                    }
+                } else { // if tab key pressed
+                    if (document.activeElement === lastFocusableElement) {
+                        firstFocusableElement.focus(); // move focus to the first focusable element
+                        e.preventDefault();
+                    }
+                }
+            });
         }
 
         /**
-         * Closes the updates modal.
+         * Closes the updates modal and restores focus.
          */
         function closeUpdatesModal() {
-            document.getElementById('updatesModal').classList.remove('active');
+            const modal = document.getElementById('updatesModal');
+            modal.classList.remove('active');
+            // Restore focus to the element that had focus before the modal opened
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+                lastFocusedElement = null; // Clear stored element
+            }
         }
 
-        // Initially hide the copy button
+        // Event listeners for input field UI updates
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('copyButton').style.display = 'none';
+            const usernameInput = document.getElementById('usernameInput');
+            usernameInput.addEventListener('input', updateInputUI);
+            updateInputUI(); // Initial call to set counter and clear button state
+
+            // Initially hide the "Copy All" button
+            document.getElementById('copyAllButton').style.display = 'none';
         });
     </script>
 </body>
