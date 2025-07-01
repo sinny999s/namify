@@ -65,13 +65,21 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Common Styles for H2 */
+        /* Common Styles for H2 and H3 within modals */
         h2 {
             margin-bottom: 20px;
             font-size: 3.5em; /* Larger heading */
             font-weight: 700; /* Bolder font */
             letter-spacing: 2px; /* Spacing for impact */
             text-shadow: 0 0 15px rgba(255,255,255,0.5); /* Glowing effect */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: #fff;
+            text-align: center;
         }
 
         /* Input container for positioning clear button and counter */
@@ -81,7 +89,7 @@
             margin-bottom: 20px;
         }
 
-        /* Common Styles for Input Field */
+        /* Common Styles for Input Field (used throughout the app and modals) */
         input {
             padding: 15px 20px; /* Increased padding */
             font-size: 1.1em; /* Slightly larger font */
@@ -144,7 +152,7 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* Common Styles for Buttons */
+        /* Common Styles for Buttons (used throughout the app and modals) */
         button {
             padding: 15px 30px; /* Increased padding */
             font-size: 1.1em; /* Slightly larger font */
@@ -180,7 +188,7 @@
             cursor: not-allowed;
         }
 
-        /* Loading spinner */
+        /* Loading spinner (used throughout the app and modals) */
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-top: 3px solid #00bcd4; /* Cyan spinner */
@@ -255,7 +263,13 @@
             word-break: break-all; /* Break long words */
         }
 
-        .output-item .copy-individual-button {
+        .output-item .output-buttons {
+            display: flex;
+            gap: 5px; /* Space between copy and make account buttons */
+        }
+
+        .output-item .copy-individual-button,
+        .output-item .make-account-button { /* Apply common styles to both buttons */
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.6);
@@ -264,9 +278,15 @@
             font-size: 0.9em;
             transition: color 0.2s ease; /* Only color transition */
             padding: 5px; /* Make clickable area larger */
+            box-shadow: none !important; /* Force no shadow */
+            transform: none !important; /* Ensure no transform */
+            display: flex; /* For SVG alignment */
+            align-items: center;
+            justify-content: center;
         }
 
-        .output-item .copy-individual-button:hover {
+        .output-item .copy-individual-button:hover,
+        .output-item .make-account-button:hover {
             color: #00bcd4; /* Cyan on hover */
             background-color: transparent !important; /* Force no background */
             border: none !important; /* Force no border */
@@ -274,7 +294,8 @@
             transform: none !important; /* Ensure no transform */
         }
 
-        .output-item .copy-individual-button:active {
+        .output-item .copy-individual-button:active,
+        .output-item .make-account-button:active {
             background-color: transparent !important; /* Force no background */
             border: none !important; /* Force no border */
             box-shadow: none !important; /* Force no shadow */
@@ -451,7 +472,7 @@
             color: #ffffff;
         }
 
-        /* Modal Overlay */
+        /* Modal Overlay (used for both Updates and Make Account modals) */
         .modal-overlay {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
@@ -475,7 +496,7 @@
             visibility: visible;
         }
 
-        /* Modal Content Box */
+        /* Modal Content Box (used for both Updates and Make Account modals) */
         .modal-content {
             background-color: #0a0a2a; /* Dark background matching body */
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -495,15 +516,7 @@
             transform: translateY(0); /* Drop into place */
         }
 
-        .modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 2em;
-            color: #fff;
-            text-align: center;
-        }
-
-        /* Close Button */
+        /* Close Button (used for all modals) */
         .close-button {
             color: rgba(255, 255, 255, 0.7);
             font-size: 28px;
@@ -549,6 +562,79 @@
             margin: 0;
             font-size: 0.9em;
             line-height: 1.5;
+        }
+
+        /* Styles for Make Account Modal specific elements */
+        #makeAccountModal .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        #makeAccountModal .modal-content h3 {
+            margin-bottom: 30px;
+        }
+
+        #makeAccountModal .modal-content .form-group {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: left; /* Align labels left */
+        }
+
+        #makeAccountModal .modal-content label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #makeAccountModal .modal-content input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            text-align: center; /* Center text for selected username */
+        }
+
+        #makeAccountModal #modalUsernameInput {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            background-color: rgba(0, 188, 212, 0.1); /* Light cyan background */
+            border-color: #00bcd4;
+        }
+
+        #makeAccountModal #generateAccountDetailsButton {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 12px 25px;
+            font-size: 1em;
+        }
+
+        #makeAccountModal .generated-details-section {
+            width: 100%;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #makeAccountModal .generated-details-section h4 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        #makeAccountModal .disclaimer-text {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px;
+            line-height: 1.4;
         }
 
 
@@ -621,6 +707,22 @@
             }
             .update-item p {
                 font-size: 0.85em;
+            }
+            #makeAccountModal .modal-content input[type="text"] {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+            #makeAccountModal #modalUsernameInput {
+                font-size: 1.1em;
+            }
+            #makeAccountModal .generated-details-section h4 {
+                font-size: 1.5em;
+            }
+            #makeAccountModal .modal-content label {
+                font-size: 0.8em;
+            }
+            #makeAccountModal .disclaimer-text {
+                font-size: 0.7em;
             }
         }
 
@@ -717,6 +819,50 @@
         </div>
     </div>
 
+    <!-- Make Account Modal -->
+    <div id="makeAccountModal" class="modal-overlay">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="makeAccountModalTitle">
+            <span class="close-button" onclick="closeMakeAccountModal()" aria-label="Close account creation form">&times;</span>
+            <h3 id="makeAccountModalTitle">Create Account Details</h3>
+
+            <div class="form-group">
+                <label for="modalUsernameInput">Selected Username:</label>
+                <input type="text" id="modalUsernameInput" readonly>
+            </div>
+
+            <button id="generateAccountDetailsButton" onclick="generateAccountDetails()">
+                <span id="modalAccountButtonText">Generate Account Details</span>
+                <span id="modalLoadingSpinner" class="spinner"></span>
+            </button>
+
+            <div class="generated-details-section">
+                <h4>Generated Details</h4>
+                <div class="form-group">
+                    <label for="modalGeneratedEmail">Email:</label>
+                    <input type="text" id="modalGeneratedEmail" readonly placeholder="Email will appear here">
+                </div>
+
+                <div class="form-group">
+                    <label for="modalGeneratedPassword">Password:</label>
+                    <input type="text" id="modalGeneratedPassword" readonly placeholder="Password will appear here">
+                </div>
+            </div>
+
+            <p class="disclaimer-text">
+                Note: This "Generate Account Details" feature is a simulation and does not create a real account or email.
+                It demonstrates how you would integrate with a backend API.
+            </p>
+        </div>
+    </div>
+
+    <!-- Custom Message Box (for account generation modal) -->
+    <div id="modalAccountMessageBox" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modalAccountMessageContent" class="mb-4"></p>
+            <button id="closeModalAccountMessageBox" onclick="closeModalAccountMessageBox()">OK</button>
+        </div>
+    </div>
+
     <script>
         // Define homoglyph mappings
         const homoglyphs = {
@@ -745,6 +891,59 @@
         };
 
         let lastFocusedElement = null; // To store the element that had focus before modal opened
+
+        /**
+         * Generates a random alphanumeric string of a given length.
+         * @param {number} length - The desired length of the string.
+         * @returns {string} A random alphanumeric string.
+         */
+        function generateRandomString(length) {
+            const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        /**
+         * Generates a secure password of a given length.
+         * Ensures it includes at least one uppercase, one number, and one special character.
+         * @param {number} length - The desired length of the password.
+         * @returns {string} A secure random password.
+         */
+        function generateSecurePassword(length) {
+            const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+            const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numberChars = '0123456789';
+            const specialChars = '!@#$%^&*()-_+=[]{}|;:,.<>?';
+            const allChars = lowercaseChars + uppercaseChars + numberChars + specialChars;
+
+            let password = '';
+            let hasUppercase = false;
+            let hasNumber = false;
+            let hasSpecial = false;
+
+            // Ensure at least one of each required type
+            password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
+            password += numberChars.charAt(Math.floor(Math.random() * numberChars.length));
+            password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+
+            hasUppercase = true;
+            hasNumber = true;
+            hasSpecial = true;
+
+            // Fill the rest of the password length with random characters
+            for (let i = password.length; i < length; i++) {
+                password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+            }
+
+            // Shuffle the password to randomize character positions
+            password = password.split('').sort(() => 0.5 - Math.random()).join('');
+
+            return password;
+        }
+
 
         /**
          * Updates the character counter and shows/hides the clear button.
@@ -901,18 +1100,26 @@
                 const filtered = results.filter(v => v !== input);
 
                 if (filtered.length > 0) {
-                    // Display results as list items with individual copy buttons
+                    // Display results as list items with individual copy and make account buttons
                     outputList.innerHTML = ``; // Clear before adding new items
                     filtered.forEach(variation => {
                         const listItem = document.createElement('li');
                         listItem.className = 'output-item';
                         listItem.innerHTML = `
                             <span>${variation}</span>
-                            <button class="copy-individual-button" onclick="copyIndividualVariation(this)" aria-label="Copy ${variation} to clipboard">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
-                                </svg>
-                            </button>
+                            <div class="output-buttons">
+                                <button class="copy-individual-button" onclick="copyIndividualVariation(this)" aria-label="Copy ${variation} to clipboard">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                                    </svg>
+                                </button>
+                                <button class="make-account-button" onclick="openMakeAccountModal('${variation}')" aria-label="Create account with username ${variation}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                                    </svg>
+                                </button>
+                            </div>
                         `;
                         outputList.appendChild(listItem);
                     });
@@ -950,16 +1157,18 @@
         }
 
         /**
-         * Opens the updates modal and traps focus.
+         * Opens a modal and traps focus within it.
+         * @param {string} modalId - The ID of the modal to open.
+         * @param {HTMLElement | null} initialFocusElement - Optional element to focus initially inside the modal.
          */
-        function openUpdatesModal() {
+        function openModal(modalId, initialFocusElement = null) {
             lastFocusedElement = document.activeElement; // Store currently focused element
-            const modal = document.getElementById('updatesModal');
+            const modal = document.getElementById(modalId);
             modal.classList.add('active');
 
             // Get all focusable elements inside the modal
             const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            const firstFocusableElement = focusableElements[0];
+            const firstFocusableElement = initialFocusElement || focusableElements[0];
             const lastFocusableElement = focusableElements[focusableElements.length - 1];
 
             // Focus the first element when modal opens
@@ -990,16 +1199,109 @@
         }
 
         /**
-         * Closes the updates modal and restores focus.
+         * Closes a modal and restores focus.
+         * @param {string} modalId - The ID of the modal to close.
          */
-        function closeUpdatesModal() {
-            const modal = document.getElementById('updatesModal');
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
             modal.classList.remove('active');
             // Restore focus to the element that had focus before the modal opened
             if (lastFocusedElement) {
                 lastFocusedElement.focus();
                 lastFocusedElement = null; // Clear stored element
             }
+        }
+
+        /**
+         * Opens the updates modal.
+         */
+        function openUpdatesModal() {
+            openModal('updatesModal');
+        }
+
+        /**
+         * Closes the updates modal.
+         */
+        function closeUpdatesModal() {
+            closeModal('updatesModal');
+        }
+
+        /**
+         * Opens the make account modal with the selected username.
+         * @param {string} username - The username to pre-fill in the modal.
+         */
+        function openMakeAccountModal(username) {
+            document.getElementById('modalUsernameInput').value = username;
+            document.getElementById('modalGeneratedEmail').value = ''; // Clear previous results
+            document.getElementById('modalGeneratedPassword').value = ''; // Clear previous results
+            openModal('makeAccountModal', document.getElementById('generateAccountDetailsButton'));
+        }
+
+        /**
+         * Closes the make account modal.
+         */
+        function closeMakeAccountModal() {
+            closeModal('makeAccountModal');
+        }
+
+        /**
+         * Simulates generating account details (email and password).
+         */
+        function generateAccountDetails() {
+            const selectedUsername = document.getElementById('modalUsernameInput').value;
+            const emailInput = document.getElementById('modalGeneratedEmail');
+            const passwordInput = document.getElementById('modalGeneratedPassword');
+            const generateButton = document.getElementById('generateAccountDetailsButton');
+            const spinner = document.getElementById('modalLoadingSpinner');
+            const buttonText = document.getElementById('modalAccountButtonText');
+
+            if (!selectedUsername) {
+                showMessageBox('Please select a username first.');
+                return;
+            }
+
+            // Show loading state
+            generateButton.disabled = true;
+            spinner.style.display = 'block';
+            buttonText.textContent = 'Generating...';
+            emailInput.value = '';
+            passwordInput.value = '';
+
+            // Simulate API call delay
+            setTimeout(() => {
+                // Generate a random string for the email prefix
+                const randomEmailPrefix = generateRandomString(8); // e.g., 'yaw5tw42'
+                const generatedEmail = `user_${randomEmailPrefix}@example.com`;
+
+                // Generate a secure 15-character password
+                const generatedPassword = generateSecurePassword(15);
+
+                emailInput.value = generatedEmail;
+                passwordInput.value = generatedPassword;
+
+                // Hide loading state
+                generateButton.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Generate Account Details';
+
+                showMessageBox('Account details generated successfully!');
+            }, 1500); // Simulate 1.5 second API call
+        }
+
+        /**
+         * Shows a custom message box.
+         * @param {string} message - The message to display.
+         */
+        function showMessageBox(message) {
+            document.getElementById('modalAccountMessageContent').textContent = message;
+            openModal('modalAccountMessageBox', document.getElementById('closeModalAccountMessageBox'));
+        }
+
+        /**
+         * Closes the custom message box.
+         */
+        function closeModalAccountMessageBox() {
+            closeModal('modalAccountMessageBox');
         }
 
         // Event listeners for input field UI updates
