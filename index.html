@@ -1,107 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Namify BETA</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #1e3c72, #2a5298);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namify BETA</title>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbar during transitions */
+            position: relative; /* Needed for absolute positioning of children */
+        }
 
-    h2 {
-      margin-bottom: 20px;
-      font-size: 32px;
-    }
+        /* Common Styles for H2 */
+        h2 {
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
 
-    input {
-      padding: 10px;
-      font-size: 16px;
-      width: 300px;
-      border: none;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      outline: none;
-    }
+        /* Common Styles for Input Field */
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            outline: none;
+        }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #ffffff;
-      color: #2a5298;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+        /* Common Styles for Buttons */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ffffff;
+            color: #2a5298;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
 
-    button:hover {
-      background-color: #f0f0f0;
-    }
+        button:hover {
+            background-color: #f0f0f0;
+        }
 
-    #output {
-      margin-top: 20px;
-      width: 80%;
-      max-height: 300px;
-      overflow-y: auto;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 8px;
-      white-space: pre-wrap;
-      font-family: monospace;
-    }
-  </style>
+        /* Styles for the Output Area */
+        #output {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 500px; /* Limit width for better readability */
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
+            font-family: monospace;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        }
+
+        /* --- Welcome Screen Specific Styles --- */
+        #welcomeScreen {
+            text-align: center;
+            transition: opacity 0.5s ease-in-out; /* Smooth fade out transition */
+            position: absolute; /* Position over mainApp */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex; /* Keep flex for centering content */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, #1e3c72, #2a5298); /* Match body background */
+            z-index: 10; /* Ensure it's on top initially */
+        }
+
+        #welcomeScreen h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add text shadow */
+        }
+
+        #welcomeScreen p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            max-width: 600px; /* Limit paragraph width */
+            line-height: 1.5;
+        }
+
+        #welcomeScreen button {
+            padding: 15px 30px;
+            font-size: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add button shadow */
+        }
+
+        /* --- Main Application Specific Styles --- */
+        #mainApp {
+            opacity: 0; /* Initially hidden */
+            pointer-events: none; /* Disable interactions when hidden */
+            transition: opacity 0.5s ease-in-out; /* Smooth fade in transition */
+            display: flex; /* Always display as flex for layout */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%; /* Take full width */
+            height: 100%; /* Take full height */
+            position: absolute; /* Position over welcome screen initially */
+            top: 0;
+            left: 0;
+            z-index: 5; /* Below welcome screen initially */
+        }
+
+        #mainApp.visible {
+            opacity: 1; /* Show when visible */
+            pointer-events: all; /* Enable interactions */
+            z-index: 11; /* Bring to front after welcome screen fades */
+        }
+    </style>
 </head>
 <body>
-  <h2>Namify BETA</h2>
-  <input type="text" id="usernameInput" placeholder="Enter username...">
-  <button onclick="generateHomoglyphs()">Generate Variations</button>
 
-  <div id="output"></div>
+    <!-- Welcome Screen Section -->
+    <div id="welcomeScreen">
+        <h1>Welcome to Namify BETA!</h1>
+        <p>Your go-to tool for generating unique username variations using homoglyphs. Discover creative and secure alternatives for your online presence.</p>
+        <button onclick="startApp()">Get Started</button>
+    </div>
 
-  <script>
-    const homoglyphs = {
-      'a': ['a', 'а'],
-      'e': ['e', 'е'],
-      'o': ['o', 'о'],
-      'c': ['c', 'с'],
-      'p': ['p', 'р'],
-      'x': ['x', 'х'],
-      'y': ['y', 'у'],
-      's': ['s', 'ѕ'],
-      'i': ['i', 'і']
-    };
+    <!-- Main Application Section (Initially Hidden) -->
+    <div id="mainApp">
+        <h2>Namify BETA</h2>
+        <input type="text" id="usernameInput" placeholder="Enter username...">
+        <button onclick="generateHomoglyphs()">Generate Variations</button>
+        <div id="output"></div>
+    </div>
 
-    function generateHomoglyphs() {
-      const input = document.getElementById('usernameInput').value;
-      if (!input) return;
+    <script>
+        // Define homoglyph mappings
+        const homoglyphs = {
+            'a': ['a', 'а'], // Latin 'a' vs Cyrillic 'а'
+            'e': ['e', 'е'], // Latin 'e' vs Cyrillic 'е'
+            'o': ['o', 'о'], // Latin 'o' vs Cyrillic 'о'
+            'c': ['c', 'с'], // Latin 'c' vs Cyrillic 'с'
+            'p': ['p', 'р'], // Latin 'p' vs Cyrillic 'р'
+            'x': ['x', 'х'], // Latin 'x' vs Cyrillic 'х'
+            'y': ['y', 'у'], // Latin 'y' vs Cyrillic 'у'
+            's': ['s', 'ѕ'], // Latin 's' vs Cyrillic 'ѕ' (Cyrillic Dze)
+            'i': ['i', 'і']  // Latin 'i' vs Cyrillic dotted 'і'
+        };
 
-      let results = [''];
-      for (let char of input) {
-        let variants = homoglyphs[char.toLowerCase()] || [char];
-        let temp = [];
-        for (let base of results) {
-          for (let v of variants) {
-            temp.push(base + v);
-          }
+        /**
+         * Generates homoglyph variations of the input username.
+         * Displays the results in the #output div.
+         */
+        function generateHomoglyphs() {
+            const input = document.getElementById('usernameInput').value;
+            if (!input) {
+                document.getElementById('output').innerHTML = "Please enter a username to generate variations.";
+                return; // Exit if input is empty
+            }
+
+            let results = ['']; // Initialize with an empty string to build variations
+            // Iterate over each character in the input string
+            for (let char of input) {
+                const lowerChar = char.toLowerCase();
+                // Get possible variants for the current character (based on its lowercase form)
+                // If no homoglyph is defined, use the original character itself
+                let variantsForChar = homoglyphs[lowerChar] || [char];
+
+                let temp = []; // Temporary array to store new combinations
+                // Combine existing results with new variants
+                for (let base of results) {
+                    for (let variant of variantsForChar) {
+                        // Check if the original character was uppercase AND it's an alphabetic character
+                        // AND the variant itself is an alphabetic character (to avoid uppercasing numbers/symbols)
+                        if (char === char.toUpperCase() && char !== char.toLowerCase() && variant.toLowerCase() !== variant.toUpperCase()) {
+                            temp.push(base + variant.toUpperCase());
+                        } else {
+                            temp.push(base + variant);
+                        }
+                    }
+                }
+                results = temp; // Update results with the new combinations
+            }
+
+            // Filter out the original input from the results to only show variations
+            const filtered = results.filter(v => v !== input);
+
+            const outputDiv = document.getElementById('output');
+            if (filtered.length > 0) {
+                outputDiv.innerHTML = `<strong>${filtered.length} Variations Found:</strong>\n\n` + filtered.join('\n');
+            } else {
+                outputDiv.innerHTML = "No homoglyph variations found for the given username.";
+            }
         }
-        results = temp;
-      }
 
-      // Remove original input if it exists in results
-      const filtered = results.filter(v => v !== input);
+        /**
+         * Handles the transition from the welcome screen to the main application.
+         * Fades out the welcome screen and fades in the main application.
+         */
+        function startApp() {
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const mainApp = document.getElementById('mainApp');
 
-      const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = `<strong>${filtered.length} Variations Found:</strong>\n\n` + filtered.join('\n');
-    }
-  </script>
+            // Start fade out of welcome screen
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.pointerEvents = 'none'; // Disable clicks on fading screen
+
+            // Immediately start fading in the main app
+            mainApp.classList.add('visible'); // This will trigger the opacity transition for mainApp
+
+            // After the welcome screen's fade out transition completes, hide it completely
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none'; // Completely remove welcome screen from layout
+            }, 500); // Duration matches the CSS transition time (0.5s)
+        }
+
+        // mainApp is initially hidden by opacity: 0 and pointer-events: none in CSS
+        // No need for DOMContentLoaded listener to hide mainApp with display: none
+    </script>
 </body>
 </html>
