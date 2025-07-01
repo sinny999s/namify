@@ -6,6 +6,8 @@
     <title>Namify BETA</title>
     <!-- Google Fonts - Poppins for a modern, clean look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* General Body Styling */
         body {
@@ -663,8 +665,16 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        #makeAccountModal .modal-content input[type="text"] {
+        /* Input with copy button container */
+        #makeAccountModal .input-with-copy {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Space between input and button */
             width: 100%;
+        }
+
+        #makeAccountModal .modal-content input[type="text"] {
+            flex-grow: 1; /* Allow input to take available space */
             padding: 10px 15px;
             font-size: 1em;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -682,6 +692,33 @@
             background-color: rgba(0, 188, 212, 0.1); /* Light cyan background */
             border-color: #00bcd4;
         }
+
+        /* Copy button within the modal */
+        #makeAccountModal .copy-modal-btn {
+            background-color: #00bcd4; /* Cyan for copy buttons */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px; /* Square button */
+            width: 35px; /* Fixed width for icon */
+            height: 35px; /* Fixed height for icon */
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+
+        #makeAccountModal .copy-modal-btn:hover {
+            background-color: #00aabf;
+            transform: translateY(-1px);
+        }
+        #makeAccountModal .copy-modal-btn:active {
+            transform: translateY(0);
+        }
+
 
         #makeAccountModal #generateAccountDetailsButton {
             margin-top: 20px;
@@ -730,6 +767,26 @@
             transform: translateY(0) scale(0.99);
             box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3);
         }
+
+        /* Download PDF button specific styles */
+        #downloadPdfButton {
+            margin-top: 15px; /* Space from Epic Games button */
+            background-color: #ff5722; /* Orange color for PDF button */
+            color: white;
+            box-shadow: 0 4px 8px rgba(255, 87, 34, 0.4);
+        }
+
+        #downloadPdfButton:hover {
+            background-color: #e64a19; /* Slightly darker orange on hover */
+            animation: none;
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 10px rgba(255, 87, 34, 0.5);
+        }
+        #downloadPdfButton:active {
+            transform: translateY(0) scale(0.99);
+            box-shadow: 0 2px 4px rgba(255, 87, 34, 0.3);
+        }
+
 
         /* Chatbot Modal Specific Styles */
         #chatbotModal .modal-content {
@@ -988,7 +1045,7 @@
 
         <!-- Version number text -->
         <div class="version-text">
-            V0.09
+            V0.12
         </div>
 
         <!-- Updates button -->
@@ -1006,6 +1063,51 @@
             <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
             <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.12 -->
+                <div class="update-item">
+                    <h4>V0.12 - Extension Integration!</h4>
+                    <p>
+                        Namify now actively communicates with its companion Chrome extension!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Automatic Extension Updates:** When you generate account details within the "Create Account Details" modal, Namify will now automatically send these details to the Chrome extension. If the extension's pop-up is open, it will update in real-time!</li>
+                            <li>**Seamless Workflow:** This creates a more integrated experience, reducing manual steps and making it even faster to get your generated details into the extension.</li>
+                            <li>**Under-the-Hood Communication:** Implemented secure `window.postMessage` to send data from the Namify app to the extension's content script, which then forwards it to the extension's pop-up.</li>
+                        </ul>
+                        Ensure your Chrome extension is also updated to V1.1 (or later) for this feature to work correctly!
+                    </p>
+                </div>
+                <!-- Update V0.11 -->
+                <div class="update-item">
+                    <h4>V0.11 - In-App Copy Convenience!</h4>
+                    <p>
+                        We've made copying your generated account details even easier, directly within the Namify app!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Direct Copy Buttons in Account Modal:** You no longer need a separate Chrome extension to copy individual details! Dedicated "copy" buttons have been added right next to the generated email and password fields in the "Create Account Details" modal.</li>
+                            <li>**Streamlined Workflow:** This enhancement provides a practical way to store and manage your newly generated credentials, improving the overall utility of the account creation simulation.</li>
+                            <li>**Minor UI Adjustments:** Subtle styling tweaks have been applied to ensure the new copy buttons blend seamlessly with the existing modal design.</li>
+                        </ul>
+                        Namify continues to evolve with your convenience in mind!
+                    </p>
+                </div>
+                <!-- Update V0.10 -->
+                <div class="update-item">
+                    <h4>V0.10 - The PDF Export Update!</h4>
+                    <p>
+                        Namify now empowers you with the ability to export your generated account details!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**PDF Export for Account Details:** A new "Download PDF" button has been added to the "Create Account Details" modal. You can now easily save your generated username, email, and password into a convenient PDF document for safekeeping.</li>
+                            <li>**Enhanced Usability:** This feature provides a practical way to store and manage your newly generated credentials, improving the overall utility of the account creation simulation.</li>
+                            <li>**Minor Code Refinements:** Continued optimization of the codebase ensures smooth integration and reliable performance of the new PDF generation functionality.</li>
+                        </ul>
+                        Namify is constantly evolving to provide you with more powerful and user-friendly tools!
+                    </p>
+                </div>
                 <!-- Update V0.09 -->
                 <div class="update-item">
                     <h4>V0.09 - The Cosmic Dust Update!</h4>
@@ -1143,17 +1245,35 @@
                 <h4>Generated Details</h4>
                 <div class="form-group">
                     <label for="modalGeneratedEmail">Email:</label>
-                    <input type="text" id="modalGeneratedEmail" readonly placeholder="Email will appear here">
+                    <div class="input-with-copy">
+                        <input type="text" id="modalGeneratedEmail" readonly placeholder="Email will appear here">
+                        <button class="copy-modal-btn" onclick="copyTextToClipboard(document.getElementById('modalGeneratedEmail').value)" aria-label="Copy generated email">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="modalGeneratedPassword">Password:</label>
-                    <input type="text" id="modalGeneratedPassword" readonly placeholder="Password will appear here">
+                    <div class="input-with-copy">
+                        <input type="text" id="modalGeneratedPassword" readonly placeholder="Password will appear here">
+                        <button class="copy-modal-btn" onclick="copyTextToClipboard(document.getElementById('modalGeneratedPassword').value)" aria-label="Copy generated password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <button id="createEpicAccountButton" onclick="window.open('https://www.epicgames.com/id/register/date-of-birth', '_blank')" aria-label="Go to Epic Games registration page">
                 Create Account on Epic Games
+            </button>
+
+            <button id="downloadPdfButton" onclick="downloadAccountDetailsPdf()" aria-label="Download generated account details as PDF">
+                Download PDF
             </button>
 
             <p class="disclaimer-text">
@@ -1608,6 +1728,13 @@
                 emailInput.value = generatedEmail;
                 passwordInput.value = generatedPassword;
 
+                // Send details to the Chrome extension
+                sendAccountDetailsToExtension({
+                    username: selectedUsername,
+                    email: generatedEmail,
+                    password: generatedPassword
+                });
+
                 // Hide loading state
                 generateButton.disabled = false;
                 spinner.style.display = 'none';
@@ -1616,6 +1743,18 @@
                 // After generating, show message box, but ensure focus returns to generate button
                 showMessageBox('Account details generated successfully!', document.getElementById('generateAccountDetailsButton'));
             }, 1500); // Simulate 1.5 second API call
+        }
+
+        /**
+         * Sends generated account details to the Chrome extension via window.postMessage.
+         * @param {object} details - Object containing username, email, and password.
+         */
+        function sendAccountDetailsToExtension(details) {
+            // Use a specific message type to avoid conflicts with other messages
+            window.postMessage({
+                type: 'NAMIFY_ACCOUNT_DETAILS',
+                payload: details
+            }, '*'); // '*' allows communication with any origin. For production, specify your extension ID.
         }
 
         /**
@@ -1765,6 +1904,53 @@
                 chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom again
             }
         }
+
+        /**
+         * Downloads the generated account details as a PDF.
+         */
+        function downloadAccountDetailsPdf() {
+            const username = document.getElementById('modalUsernameInput').value;
+            const email = document.getElementById('modalGeneratedEmail').value;
+            const password = document.getElementById('modalGeneratedPassword').value;
+
+            if (!username || !email || !password) {
+                showMessageBox('Please generate account details first before downloading the PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(22);
+            doc.text("Namify Account Details", 105, 20, null, null, "center");
+
+            doc.setFontSize(12);
+            doc.text("Generated on: " + new Date().toLocaleString(), 105, 30, null, null, "center");
+
+            doc.setFontSize(16);
+            doc.text("Username:", 20, 60);
+            doc.setFontSize(14);
+            doc.text(username, 20, 70);
+
+            doc.setFontSize(16);
+            doc.text("Email:", 20, 90);
+            doc.setFontSize(14);
+            doc.text(email, 20, 100);
+
+            doc.setFontSize(16);
+            doc.text("Password:", 20, 120);
+            doc.setFontSize(14);
+            doc.text(password, 20, 130);
+
+            doc.setFontSize(10);
+            doc.text("Please keep these details secure. This PDF is for your convenience.", 105, 160, null, null, "center");
+            doc.text("This is a simulated account generation and does not create a real account.", 105, 170, null, null, "center");
+
+
+            doc.save(`Namify_Account_Details_${username}.pdf`);
+            showMessageBox('PDF downloaded successfully!');
+        }
+
 
         // Particle System Logic
         const canvas = document.getElementById('particleCanvas');
