@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Namify BETA</title>
-    <!-- Google Fonts - Poppins for a modern, clean look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* General Body Styling */
         body {
             font-family: 'Poppins', sans-serif; /* Changed font to Poppins */
             background-color: #0a0a2a; /* Dark blue base for space */
-            /* Starry pattern */
+            /* Starry pattern - fixed pixel values */
             background-image:
                 radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
                 radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 40px),
@@ -43,7 +42,7 @@
             position: relative; /* Needed for absolute positioning of children */
         }
 
-        /* Keyframe animation for subtle star movement */
+        /* Keyframe animation for subtle star movement - fixed pixel values */
         @keyframes moveStars {
             from {
                 background-position: 0 0, 40px 60px, 130px 270px, 70px 180px, 200px 400px;
@@ -213,7 +212,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Match body background for seamless transition */
+            /* Match body background for seamless transition - fixed pixel values */
             background-color: #0a0a2a;
             background-image:
                 radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
@@ -304,6 +303,127 @@
             pointer-events: none; /* Allow clicks to pass through */
         }
 
+        /* Updates button styling */
+        .updates-button {
+            position: absolute;
+            top: 45px; /* Position below version number */
+            left: 20px;
+            padding: 5px 10px;
+            font-size: 0.75em;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 12;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .updates-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
+            display: flex; /* Use flex to center content */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modal Content Box */
+        .modal-content {
+            background-color: #0a0a2a; /* Dark background matching body */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh; /* Max height to allow scrolling */
+            overflow-y: auto; /* Enable scrolling for content */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px); /* Initial slight lift */
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0); /* Drop into place */
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2em;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Close Button */
+        .close-button {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Update Item Box */
+        .update-item {
+            background-color: rgba(255, 255, 255, 0.08); /* Slightly lighter background for each update */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px; /* Space between updates */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: #e0e0e0;
+        }
+
+        .update-item:last-child {
+            margin-bottom: 0; /* No margin for the last item */
+        }
+
+        .update-item h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+            color: #00bcd4; /* Cyan for version number */
+            font-weight: 600;
+        }
+
+        .update-item p {
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
 
         /* Responsive Adjustments */
         @media (max-width: 768px) {
@@ -345,6 +465,32 @@
                 top: 10px;
                 left: 10px;
             }
+            .updates-button {
+                font-size: 0.65em;
+                top: 35px; /* Adjust position for smaller font */
+                left: 10px;
+                padding: 3px 8px;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .modal-content h3 {
+                font-size: 1.5em;
+            }
+            .close-button {
+                font-size: 24px;
+                top: 5px;
+                right: 10px;
+            }
+            .update-item {
+                padding: 10px;
+            }
+            .update-item h4 {
+                font-size: 1.1em;
+            }
+            .update-item p {
+                font-size: 0.85em;
+            }
         }
 
         @media (max-width: 480px) {
@@ -369,14 +515,12 @@
 </head>
 <body>
 
-    <!-- Welcome Screen Section -->
     <div id="welcomeScreen">
         <h1>Welcome to Namify BETA!</h1>
         <p>Namify helps you instantly generate sleek, timeless usernames. One click, countless clean variations. No clutter. No compromise.</p>
         <button onclick="startApp()" aria-label="Get Started with Namify Beta">Get Started</button>
     </div>
 
-    <!-- Main Application Section (Initially Hidden) -->
     <div id="mainApp">
         <h2>Namify BETA</h2>
         <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
@@ -390,14 +534,31 @@
             </div>
         </div>
 
-        <!-- Footer text -->
         <div class="footer-text">
             @Kfzv and @fuckpanpan on Discord
         </div>
 
-        <!-- Version number text -->
         <div class="version-text">
             V0.02
+        </div>
+
+        <button class="updates-button" onclick="openUpdatesModal()" aria-label="View application updates history">Updates?</button>
+    </div>
+
+    <div id="updatesModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeUpdatesModal()">&times;</span>
+            <h3>Updates History</h3>
+            <div class="updates-list">
+                <div class="update-item">
+                    <h4>V0.02</h4>
+                    <p>Enhanced UI Design, Welcome Screen, Footer Text, Version Number, Chroma Buttons, 16-Character Limit, Caps-Friendly Generator, Easter Eggs (PanPan, Sinny)</p>
+                </div>
+                <div class="update-item">
+                    <h4>V0.01</h4>
+                    <p>Boring ass generator</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -531,6 +692,20 @@
             setTimeout(() => {
                 welcomeScreen.style.display = 'none'; // Completely remove welcome screen from layout
             }, 500); // Duration matches the CSS transition time (0.5s)
+        }
+
+        /**
+         * Opens the updates modal.
+         */
+        function openUpdatesModal() {
+            document.getElementById('updatesModal').classList.add('active');
+        }
+
+        /**
+         * Closes the updates modal.
+         */
+        function closeUpdatesModal() {
+            document.getElementById('updatesModal').classList.remove('active');
         }
 
         // Initially hide the copy button
