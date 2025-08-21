@@ -425,28 +425,204 @@
                 200px 400px;
             animation: moveStars 100s linear infinite; /* Apply same star movement */
             z-index: 10; /* Ensure it's on top initially */
+            cursor: pointer;
+            overflow: hidden; /* Hide overflow for warp effect */
         }
 
-        #welcomeScreen h1 {
-            font-size: 4.5em; /* Larger welcome heading */
-            margin-bottom: 30px;
-            font-weight: 700;
+        /* Space portal animation */
+        .space-portal {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .portal-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(0, 188, 212, 0.3);
+            border-radius: 50%;
+            animation: portalPulse 3s ease-in-out infinite;
+        }
+
+        .portal-ring:nth-child(1) {
+            animation-delay: 0s;
+            transform: scale(1);
+        }
+
+        .portal-ring:nth-child(2) {
+            animation-delay: 1s;
+            transform: scale(0.8);
+        }
+
+        .portal-ring:nth-child(3) {
+            animation-delay: 2s;
+            transform: scale(0.6);
+        }
+
+        @keyframes portalPulse {
+            0% {
+                transform: scale(0.6);
+                opacity: 0;
+                border-color: rgba(0, 188, 212, 0);
+            }
+            50% {
+                opacity: 1;
+                border-color: rgba(0, 188, 212, 0.6);
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+                border-color: rgba(0, 188, 212, 0);
+            }
+        }
+
+        .welcome-title {
+            font-size: 5em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 20px rgba(0, 188, 212, 0.8),
+                0 0 40px rgba(0, 188, 212, 0.6),
+                0 0 60px rgba(0, 188, 212, 0.4);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+            z-index: 2;
+            position: relative;
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 
+                    0 0 20px rgba(0, 188, 212, 0.8),
+                    0 0 40px rgba(0, 188, 212, 0.6),
+                    0 0 60px rgba(0, 188, 212, 0.4);
+            }
+            100% {
+                text-shadow: 
+                    0 0 30px rgba(0, 188, 212, 1),
+                    0 0 50px rgba(0, 188, 212, 0.8),
+                    0 0 70px rgba(0, 188, 212, 0.6);
+            }
+        }
+
+        .welcome-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 50px;
+            opacity: 0.8;
+            font-weight: 300;
+            letter-spacing: 2px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .click-indicator {
+            position: relative;
+            display: inline-block;
+            z-index: 2;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 150px;
+            height: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 25px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulsate 2s ease-out infinite;
+        }
+
+        @keyframes pulsate {
+            0% {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .click-text {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
             letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.7); /* Stronger glow */
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 25px;
+            animation: clickPulse 2s ease-in-out infinite;
         }
 
-        #welcomeScreen p {
-            font-size: 1.4em; /* Larger welcome text */
-            margin-bottom: 50px; /* More space before button */
-            max-width: 700px; /* Wider paragraph */
-            line-height: 1.6;
-            font-weight: 300; /* Lighter font weight */
+        @keyframes clickPulse {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
         }
 
-        #welcomeScreen button {
-            padding: 20px 40px; /* Larger button */
-            font-size: 1.5em; /* Larger font */
-            font-weight: 700; /* Bolder font */
+        /* Warp speed lines for transition */
+        .warp-lines-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .warp-line {
+            position: absolute;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
+            height: 2px;
+            width: 0;
+            transform-origin: center left;
+            animation: warpSpeed 0.5s ease-out forwards;
+        }
+
+        @keyframes warpSpeed {
+            0% {
+                width: 0;
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                width: 200vw;
+                opacity: 0;
+            }
+        }
+
+        /* Space blast animation class */
+        #welcomeScreen.space-blast {
+            animation: spaceBlast 1.5s ease-in forwards;
+        }
+
+        @keyframes spaceBlast {
+            0% {
+                transform: scale(1) rotateZ(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1) rotateZ(5deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(50) rotateZ(15deg);
+                opacity: 0;
+            }
         }
 
         /* --- Main Application Specific Styles --- */
@@ -888,16 +1064,22 @@
             #output {
                 font-size: 0.9em;
             }
-            #welcomeScreen h1 {
-                font-size: 3em;
+            .welcome-title {
+                font-size: 3.5em;
+                letter-spacing: 2px;
             }
-            #welcomeScreen p {
-                font-size: 1.1em;
-                max-width: 90%;
-            }
-            #welcomeScreen button {
+            .welcome-subtitle {
                 font-size: 1.2em;
-                padding: 15px 30px;
+                max-width: 90%;
+                margin-bottom: 40px;
+            }
+            .space-portal {
+                width: 250px;
+                height: 250px;
+            }
+            .click-text {
+                font-size: 1em;
+                padding: 12px 30px;
             }
             .footer-text {
                 font-size: 0.75em;
@@ -982,15 +1164,26 @@
             .input-container {
                 width: 90%;
             }
-            #welcomeScreen h1 {
-                font-size: 2.2em;
+            .welcome-title {
+                font-size: 2.5em;
+                letter-spacing: 1px;
             }
-            #welcomeScreen p {
-                font-size: 0.9em;
-            }
-            #welcomeScreen button {
+            .welcome-subtitle {
                 font-size: 1em;
-                padding: 12px 25px;
+                margin-bottom: 30px;
+            }
+            .space-portal {
+                width: 200px;
+                height: 200px;
+            }
+            .click-text {
+                font-size: 0.9em;
+                padding: 10px 25px;
+                letter-spacing: 2px;
+            }
+            .pulse-ring {
+                width: 120px;
+                height: 40px;
             }
             .chatbot-button {
                 bottom: 10px;
@@ -1007,10 +1200,20 @@
     <canvas id="particleCanvas"></canvas>
 
     <!-- Welcome Screen Section -->
-    <div id="welcomeScreen">
-        <h1>Welcome to Namify BETA!</h1>
-        <p>Namify helps you instantly generate sleek, timeless usernames. One click, countless clean variations. No clutter. No compromise.</p>
-        <button onclick="startApp()" aria-label="Get Started with Namify Beta">Get Started</button>
+    <div id="welcomeScreen" onclick="initiateSpaceJourney()">
+        <div class="space-portal">
+            <div class="portal-ring"></div>
+            <div class="portal-ring"></div>
+            <div class="portal-ring"></div>
+        </div>
+        <h1 class="welcome-title">READY TO BREAK THROUGH?</h1>
+        <p class="welcome-subtitle">Click anywhere to blast into the Namify universe</p>
+        <div class="click-indicator">
+            <span class="pulse-ring"></span>
+            <span class="click-text">CLICK TO LAUNCH</span>
+        </div>
+        <!-- Warp speed lines container -->
+        <div id="warpLines" class="warp-lines-container"></div>
     </div>
 
     <!-- Main Application Section (Initially Hidden) -->
@@ -1045,7 +1248,7 @@
 
         <!-- Version number text -->
         <div class="version-text">
-            V0.12
+            V0.16
         </div>
 
         <!-- Updates button -->
@@ -1063,6 +1266,79 @@
             <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
             <h3 id="updatesModalTitle">Updates History</h3>
             <div class="updates-list">
+                <!-- Update V0.16 -->
+                <div class="update-item">
+                    <h4>V0.16 - Enhanced Email Generation & Pause/Resume Control</h4>
+                    <p>
+                        Major improvements to email generation and extension control!
+                        <br><br>
+                        **Email Improvements:**
+                        <ul>
+                            <li>**Numbers in ALL emails**: Every generated email now includes numbers for maximum uniqueness (no more simple john.smith emails).</li>
+                            <li>**Expanded name database**: From 24 to 80+ first names and last names for much more variety.</li>
+                            <li>**7 different email patterns**: Including patterns with middle initials and various number placements.</li>
+                            <li>**Better uniqueness**: Emails like james.smith342, emma.a.thompson3847, or david428brown for less chance of duplicates.</li>
+                        </ul>
+                        <br>
+                        **Extension Updates:**
+                        <ul>
+                            <li>**Pause/Resume button**: Pause auto-fill while creating your Outlook account, then resume when ready!</li>
+                            <li>**Manual date of birth**: Extension now skips the DOB page entirely - fill it manually as requested.</li>
+                            <li>**Improved reliability**: Better email field detection and form filling logic.</li>
+                        </ul>
+                    </p>
+                </div>
+                <!-- Update V0.15 -->
+                <div class="update-item">
+                    <h4>V0.15 - Epic Games Auto-Fill Extension!</h4>
+                    <p>
+                        Introducing the Namify Epic Games Auto-Fill Chrome Extension - your ultimate companion for seamless account creation!
+                        <br><br>
+                        **Key Features:**
+                        <ul>
+                            <li>**Automatic Date of Birth**: The extension automatically fills the age verification with a random adult date (1990-2005).</li>
+                            <li>**Complete Form Auto-Fill**: All registration fields are filled instantly - email, username, password, first/last name, and even checkboxes!</li>
+                            <li>**Seamless Integration**: The extension receives account details directly from Namify - no manual copying needed.</li>
+                            <li>**Smart Name Detection**: Automatically extracts first and last names from the generated email address.</li>
+                            <li>**One-Click Registration**: Just click "Open Epic Games Registration" and watch the magic happen!</li>
+                        </ul>
+                        Install the extension from the new 'namify-epic-autofill' folder to supercharge your Epic Games account creation!
+                    </p>
+                </div>
+                <!-- Update V0.14 -->
+                <div class="update-item">
+                    <h4>V0.14 - The Realistic Account Generation Update!</h4>
+                    <p>
+                        Namify's account generation now creates ultra-realistic credentials that look and feel authentic!
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Realistic Email Addresses:** Now generates authentic-looking emails exclusively using outlook.com with realistic name combinations like "john.smith@outlook.com" or "sarah_johnson2019@outlook.com"</li>
+                            <li>**Smart Email Patterns:** Uses various realistic patterns including firstname.lastname, initials+lastname, and username-based combinations with years or numbers.</li>
+                            <li>**User-Friendly Passwords:** Passwords are now more memorable while still secure! They combine readable words with numbers and symbols (e.g., "QuickTiger482@" or "Storm#Bold789") instead of random gibberish.</li>
+                            <li>**Enhanced Security:** All passwords still meet strict security requirements with uppercase, lowercase, numbers, and special characters - just in a more user-friendly format.</li>
+                            <li>**Better Compatibility:** Uses commonly accepted special characters (!@#$%&*) to ensure passwords work across all platforms.</li>
+                        </ul>
+                        Your generated accounts now look like they could belong to real people!
+                    </p>
+                </div>
+                <!-- Update V0.13 -->
+                <div class="update-item">
+                    <h4>V0.13 - The Immersive Space Journey Update!</h4>
+                    <p>
+                        Get ready for blast-off! Namify now features an epic space launch sequence that transforms your entry into the app.
+                        <br><br>
+                        **Key Enhancements:**
+                        <ul>
+                            <li>**Immersive Welcome Experience:** The welcome screen now features a pulsating space portal with the provocative message "READY TO BREAK THROUGH?" Click anywhere to initiate your journey!</li>
+                            <li>**Space Warp Animation:** Experience a thrilling warp-speed effect as you're "blasted" through space with dynamic light trails and particle effects.</li>
+                            <li>**Enhanced Visual Design:** The welcome screen showcases glowing cyan accents, animated portal rings, and a pulsating "CLICK TO LAUNCH" indicator for maximum impact.</li>
+                            <li>**Smooth Transition Effects:** The journey from welcome to the main app is now a cinematic experience with scaling, rotation, and explosive particle animations.</li>
+                            <li>**Responsive Space Portal:** The immersive experience adapts beautifully to all screen sizes, ensuring everyone gets the full cosmic journey.</li>
+                        </ul>
+                        Prepare for launch - your username generation experience just became an intergalactic adventure!
+                    </p>
+                </div>
                 <!-- Update V0.12 -->
                 <div class="update-item">
                     <h4>V0.12 - Extension Integration!</h4>
@@ -1277,7 +1553,7 @@
             </button>
 
             <p class="disclaimer-text">
-                Note: This "Generate Account Details" feature is a simulation and does not create a real account or email. It demonstrates how you would integrate with a backend API. To customize, simply replace the @example domain with a well-known email provider like @gmail.com or @outlook.com.
+                Note: This "Generate Account Details" feature creates realistic-looking email addresses and secure passwords for demonstration purposes only. The emails are randomly generated and may or may not be available. Always verify email availability when creating real accounts.
             </p>
         </div>
     </div>
@@ -1339,54 +1615,158 @@
         let chatHistory = [{ role: "model", parts: [{ text: "Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!" }] }]; // Initialize chat history
 
         /**
-         * Generates a random alphanumeric string of a given length.
-         * @param {number} length - The desired length of the string.
-         * @returns {string} A random alphanumeric string.
+         * Generates a realistic-looking email address using Microsoft domains.
+         * @param {string} username - The base username to incorporate.
+         * @returns {string} A realistic email address.
          */
-        function generateRandomString(length) {
-            const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
+        function generateRealisticEmail(username) {
+            // Only use outlook.com domain
+            const domain = 'outlook.com';
+            
+            // Common first names for realistic combinations
+            const firstNames = ['james', 'john', 'robert', 'michael', 'william', 'david', 'richard', 'joseph', 
+                               'thomas', 'charles', 'mary', 'patricia', 'jennifer', 'linda', 'liz', 
+                               'barbara', 'susan', 'jessica', 'sarah', 'karen', 'alex', 'sam', 'chris', 'jordan',
+                               'daniel', 'matthew', 'anthony', 'mark', 'donald', 'steven', 'paul', 'andrew',
+                               'joshua', 'kenneth', 'kevin', 'brian', 'george', 'edward', 'ronald', 'timothy',
+                               'jason', 'jeffrey', 'ryan', 'jacob', 'gary', 'nick', 'eric', 'stephen',
+                               'jon', 'larry', 'justin', 'scott', 'brandon', 'frank', 'ben', 'greg',
+                               'ray', 'samuel', 'patrick', 'alex', 'jack', 'dennis', 'jerry', 'tyler',
+                               'aaron', 'henry', 'doug', 'jose', 'peter', 'adam', 'kyle', 'noah', 'nathan',
+                               'emma', 'olivia', 'ava', 'sophia', 'bella', 'mia', 'charlie', 'luna',
+                               'ella', 'liz', 'sofia', 'emily', 'avery', 'mila', 'scarlett', 'ellie'];
+            
+            // Common last names
+            const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis',
+                              'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson',
+                              'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson',
+                              'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson', 'walker',
+                              'young', 'allen', 'king', 'wright', 'scott', 'torres', 'nguyen', 'hill',
+                              'flores', 'green', 'adams', 'nelson', 'baker', 'hall', 'rivera', 'campbell',
+                              'mitchell', 'carter', 'roberts', 'gomez', 'phillips', 'evans', 'turner', 'diaz',
+                              'parker', 'cruz', 'edwards', 'collins', 'reyes', 'stewart', 'morris', 'morales',
+                              'murphy', 'cook', 'rogers', 'ortiz', 'morgan', 'cooper', 'peterson',
+                              'bailey', 'reed', 'kelly', 'howard', 'ramos', 'kim', 'cox', 'ward', 'rich'];
+            
+            // Email patterns - ALL include numbers for uniqueness
+            const patterns = [
+                () => {
+                    // firstname.lastname + number
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 999) + 100; // 100-1099
+                    return `${firstName}.${lastName}${num}`;
+                },
+                () => {
+                    // firstnamelastname + random number
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 9999) + 1000; // 1000-10999
+                    return `${firstName}${lastName}${num}`;
+                },
+                () => {
+                    // firstname_lastname + year
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const year = Math.floor(Math.random() * 25) + 1995; // Years 1995-2020
+                    const num = Math.floor(Math.random() * 99) + 1;
+                    return `${firstName}_${lastName}${year}_${num}`;
+                },
+                () => {
+                    // initial + lastname + bigger number
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 99999) + 10000; // 10000-109999
+                    return `${firstName.charAt(0)}${lastName}${num}`;
+                },
+                () => {
+                    // username-based with more numbers
+                    let cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    // Truncate username if too long to ensure total length stays under 64
+                    if (cleanUsername.length > 40) {
+                        cleanUsername = cleanUsername.substring(0, 40);
+                    }
+                    const num1 = Math.floor(Math.random() * 999) + 100;
+                    const num2 = Math.floor(Math.random() * 99) + 10;
+                    return `${cleanUsername}${num1}_${num2}`;
+                },
+                () => {
+                    // firstname + number + lastname
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 999) + 100;
+                    return `${firstName}${num}${lastName}`;
+                },
+                () => {
+                    // firstname.initial.lastname + number
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const middleInitial = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // a-z
+                    const num = Math.floor(Math.random() * 9999) + 1000;
+                    return `${firstName}.${middleInitial}.${lastName}${num}`;
+                }
+            ];
+            
+            // Select a random pattern and generate email
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            let emailPrefix = pattern();
+            
+            // Ensure email doesn't exceed Outlook's 64 character limit for local part
+            if (emailPrefix.length > 64) {
+                // Fallback to simple pattern if too long
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const num = Math.floor(Math.random() * 9999) + 1000;
+                emailPrefix = `${firstName}${num}`;
             }
-            return result;
+            
+            return `${emailPrefix}@${domain}`;
         }
 
         /**
-         * Generates a secure password of a given length.
-         * Ensures it includes at least one uppercase, one number, and one special character.
-         * @param {number} length - The desired length of the password.
-         * @returns {string} A secure random password.
+         * Generates a secure but more user-friendly password.
+         * Creates passwords that are easier to remember while meeting security requirements.
+         * @param {number} length - The desired length of the password (12-16 recommended).
+         * @returns {string} A secure password.
          */
-        function generateSecurePassword(length) {
-            const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
-            const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            const numberChars = '0123456789';
-            const specialChars = '!@#$%^&*()-_+=[]{}|;:,.<>?';
-            const allChars = lowercaseChars + uppercaseChars + numberChars + specialChars;
-
-            let password = '';
-            let hasUppercase = false;
-            let hasNumber = false;
-            let hasSpecial = false;
-
-            // Ensure at least one of each required type
-            password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
-            password += numberChars.charAt(Math.floor(Math.random() * numberChars.length));
-            password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
-
-            hasUppercase = true;
-            hasNumber = true;
-            hasSpecial = true;
-
-            // Fill the rest of the password length with random characters
-            for (let i = password.length; i < length; i++) {
-                password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+        function generateSecurePassword(length = 14) {
+            // Word components for better memorability
+            const words = ['Star', 'Moon', 'Fire', 'Ice', 'Wind', 'Storm', 'Light', 'Dark', 'Sky', 'Ocean',
+                          'Tiger', 'Eagle', 'Wolf', 'Bear', 'Lion', 'Dragon', 'Phoenix', 'Hawk', 'Shark', 'Fox',
+                          'Blue', 'Red', 'Gold', 'Silver', 'Green', 'Black', 'White', 'Purple', 'Orange', 'Cyan'];
+            
+            const adjectives = ['Quick', 'Smart', 'Strong', 'Brave', 'Bright', 'Swift', 'Bold', 'Wise', 'Cool', 'Epic'];
+            
+            // Special characters that are commonly accepted
+            const commonSpecials = ['!', '@', '#', '$', '%', '&', '*'];
+            
+            // Generate password components
+            const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const word = words[Math.floor(Math.random() * words.length)];
+            const number = Math.floor(Math.random() * 999) + 1;
+            const special = commonSpecials[Math.floor(Math.random() * commonSpecials.length)];
+            
+            // Different password patterns
+            const patterns = [
+                `${adjective}${word}${number}${special}`,
+                `${word}${special}${adjective}${number}`,
+                `${number}${adjective}${word}${special}`,
+                `${special}${word}${number}${adjective}`,
+                `${adjective}${number}${special}${word}`
+            ];
+            
+            let password = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            // Add extra random characters if needed to reach desired length
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+            while (password.length < length) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-
-            // Shuffle the password to randomize character positions
-            password = password.split('').sort(() => 0.5 - Math.random()).join('');
-
+            
+            // Ensure it's not too long
+            if (password.length > length) {
+                password = password.substring(0, length);
+            }
+            
             return password;
         }
 
@@ -1466,9 +1846,27 @@
          * @param {HTMLElement} buttonElement - The button element that was clicked.
          */
         function copyIndividualVariation(buttonElement) {
-            const variationText = buttonElement.previousElementSibling.textContent;
-            // No "Copied!" message needed for individual copy.
+            // Find the parent output-item and then get the span containing the variation text
+            const outputItem = buttonElement.closest('.output-item');
+            const variationText = outputItem.querySelector('span').textContent;
+            
+            // Copy to clipboard
             copyTextToClipboard(variationText);
+            
+            // Visual feedback: temporarily change the button icon to a checkmark
+            const originalHTML = buttonElement.innerHTML;
+            buttonElement.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                </svg>
+            `;
+            buttonElement.style.color = '#4CAF50'; // Green color for success
+            
+            // Restore original icon after 1 second
+            setTimeout(() => {
+                buttonElement.innerHTML = originalHTML;
+                buttonElement.style.color = ''; // Reset to default color
+            }, 1000);
         }
 
 
@@ -1497,7 +1895,7 @@
                 // Easter Egg 1: PanPan
                 if (normalizedInput === "panpan") {
                     outputList.innerHTML = `<li class="no-variations-message">Snowy's mom aint got no teeth so you know its slippin</li>`;
-                    copyAllButton.style.display = 'block';
+                    copyAllButton.style.display = 'none'; // Hide copy button for easter eggs
                     generateButton.disabled = false;
                     generateSpinner.style.display = 'none';
                     return;
@@ -1506,7 +1904,7 @@
                 // Easter Egg 2: Sinny
                 if (normalizedInput === "sinny") {
                     outputList.innerHTML = `<li class="no-variations-message">You Typed This Name Because You Know You Love Me</li>`;
-                    copyAllButton.style.display = 'block';
+                    copyAllButton.style.display = 'none'; // Hide copy button for easter eggs
                     generateButton.disabled = false;
                     generateSpinner.style.display = 'none';
                     return;
@@ -1551,22 +1949,42 @@
                     filtered.forEach(variation => {
                         const listItem = document.createElement('li');
                         listItem.className = 'output-item';
-                        listItem.innerHTML = `
-                            <span>${variation}</span>
-                            <div class="output-buttons">
-                                <button class="copy-individual-button" onclick="copyIndividualVariation(this)" aria-label="Copy ${variation} to clipboard">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
-                                    </svg>
-                                </button>
-                                <button class="make-account-button" onclick="openMakeAccountModal('${variation}')" aria-label="Create account with username ${variation}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                                    </svg>
-                                </button>
-                            </div>
+                        
+                        // Create elements programmatically to avoid issues with quotes in variation names
+                        const span = document.createElement('span');
+                        span.textContent = variation;
+                        
+                        const buttonsDiv = document.createElement('div');
+                        buttonsDiv.className = 'output-buttons';
+                        
+                        // Copy button
+                        const copyButton = document.createElement('button');
+                        copyButton.className = 'copy-individual-button';
+                        copyButton.setAttribute('aria-label', `Copy ${variation} to clipboard`);
+                        copyButton.onclick = function() { copyIndividualVariation(this); };
+                        copyButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                            </svg>
                         `;
+                        
+                        // Make account button
+                        const makeAccountButton = document.createElement('button');
+                        makeAccountButton.className = 'make-account-button';
+                        makeAccountButton.setAttribute('aria-label', `Create account with username ${variation}`);
+                        makeAccountButton.onclick = function() { openMakeAccountModal(variation); };
+                        makeAccountButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                            </svg>
+                        `;
+                        
+                        buttonsDiv.appendChild(copyButton);
+                        buttonsDiv.appendChild(makeAccountButton);
+                        
+                        listItem.appendChild(span);
+                        listItem.appendChild(buttonsDiv);
                         outputList.appendChild(listItem);
                     });
                     copyAllButton.style.display = 'block'; // Show copy all button
@@ -1582,24 +2000,85 @@
         }
 
         /**
-         * Handles the transition from the welcome screen to the main application.
-         * Fades out the welcome screen and fades in the main application.
+         * Initiates the immersive space journey transition from welcome to main app.
+         * Creates a warp speed effect and blast animation.
          */
-        function startApp() {
+        function initiateSpaceJourney() {
             const welcomeScreen = document.getElementById('welcomeScreen');
             const mainApp = document.getElementById('mainApp');
-
-            // Start fade out of welcome screen
-            welcomeScreen.style.opacity = '0';
-            welcomeScreen.style.pointerEvents = 'none'; // Disable clicks on fading screen
-
-            // Immediately start fading in the main app
-            mainApp.classList.add('visible'); // This will trigger the opacity transition for mainApp
-
-            // After the welcome screen's fade out transition completes, hide it completely
+            const warpLinesContainer = document.getElementById('warpLines');
+            
+            // Prevent multiple clicks during animation
+            welcomeScreen.style.pointerEvents = 'none';
+            
+            // Create warp speed lines
+            warpLinesContainer.style.opacity = '1';
+            
+            // Generate multiple warp lines from center
+            for (let i = 0; i < 50; i++) {
+                const line = document.createElement('div');
+                line.className = 'warp-line';
+                
+                // Random position around center
+                const angle = (Math.PI * 2 * i) / 50;
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const radius = Math.random() * 100;
+                
+                line.style.left = (centerX + Math.cos(angle) * radius) + 'px';
+                line.style.top = (centerY + Math.sin(angle) * radius) + 'px';
+                line.style.transform = `rotate(${angle}rad)`;
+                line.style.animationDelay = `${i * 0.01}s`;
+                
+                warpLinesContainer.appendChild(line);
+            }
+            
+            // Add space blast class after a short delay
             setTimeout(() => {
-                welcomeScreen.style.display = 'none'; // Completely remove welcome screen from layout
-            }, 500); // Duration matches the CSS transition time (0.5s)
+                welcomeScreen.classList.add('space-blast');
+                
+                // Start fading in the main app
+                mainApp.classList.add('visible');
+                
+                // Enhanced particle effect during transition
+                createBlastParticles();
+            }, 500);
+            
+            // Complete transition
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                // Clear warp lines
+                warpLinesContainer.innerHTML = '';
+            }, 2000);
+        }
+        
+        /**
+         * Creates additional particle effects during the space blast transition.
+         */
+        function createBlastParticles() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Create blast particles from center
+            for (let i = 0; i < 100; i++) {
+                const angle = (Math.PI * 2 * i) / 100;
+                const velocity = Math.random() * 10 + 5;
+                
+                const particle = {
+                    x: centerX,
+                    y: centerY,
+                    vx: Math.cos(angle) * velocity,
+                    vy: Math.sin(angle) * velocity,
+                    radius: Math.random() * 3 + 1,
+                    opacity: 1,
+                    life: 0,
+                    maxLife: 60
+                };
+                
+                particles.push(particle);
+            }
         }
 
         /**
@@ -1718,12 +2197,11 @@
 
             // Simulate API call delay
             setTimeout(() => {
-                // Generate a random string for the email prefix
-                const randomEmailPrefix = generateRandomString(8); // e.g., 'yaw5tw42'
-                const generatedEmail = `user_${randomEmailPrefix}@example.com`;
+                // Generate a realistic Outlook/Hotmail/Live email
+                const generatedEmail = generateRealisticEmail(selectedUsername);
 
-                // Generate a secure 15-character password
-                const generatedPassword = generateSecurePassword(15);
+                // Generate a secure but user-friendly password
+                const generatedPassword = generateSecurePassword(14); // 14 characters for good security
 
                 emailInput.value = generatedEmail;
                 passwordInput.value = generatedPassword;
