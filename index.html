@@ -3,1589 +3,685 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Namify BETA</title>
-    <!-- Google Fonts - Poppins for a modern, clean look -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- jsPDF library for PDF generation -->
+    <title>Namify v0.17 • Next-Gen Homoglyph & Identity Generator</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN with configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00f0ff',
+                            purple: '#8b5cf6',
+                            blue: '#3b82f6',
+                            dark: '#06070b',
+                            card: 'rgba(255, 255, 255, 0.03)',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2.5s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { filter: 'drop-shadow(0 0 15px rgba(0, 240, 255, 0.4))' },
+                            '100%': { filter: 'drop-shadow(0 0 35px rgba(139, 92, 246, 0.7))' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Canvas Confetti for celebratory feedback -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
-        /* General Body Styling */
+        /* Modern Obsidian Cosmic Background */
         body {
-            font-family: 'Poppins', sans-serif; /* Changed font to Poppins */
-            background-color: #0a0a2a; /* Dark blue base for space */
-            /* Starry pattern - fixed pixel values */
-            background-image:
-                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 40px),
-                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 25px),
-                radial-gradient(white, rgba(255,255,255,.05) 1px, transparent 20px),
-                radial-gradient(white, rgba(255,255,255,.12) 1px, transparent 35px);
-            background-size:
-                500px 500px,
-                300px 300px,
-                400px 400px,
-                200px 200px,
-                600px 600px; /* Varied sizes for more randomness */
-            background-position:
-                0 0,
-                40px 60px,
-                130px 270px,
-                70px 180px,
-                200px 400px; /* Adjust positions for a scattered effect */
-            animation: moveStars 100s linear infinite; /* Subtle star movement */
-
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Prevent scrollbar during transitions */
-            position: relative; /* Needed for absolute positioning of children */
+            background-color: #06070b;
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(0, 240, 255, 0.12), transparent 45%),
+                radial-gradient(circle at 10% 40%, rgba(139, 92, 246, 0.08), transparent 40%),
+                radial-gradient(circle at 90% 70%, rgba(59, 130, 246, 0.08), transparent 45%);
+            background-attachment: fixed;
+            color: #ffffff;
+            user-select: none;
         }
 
-        /* Canvas for particles */
+        /* Ambient Starfield Canvas */
         #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0; /* Behind other content */
-            pointer-events: none; /* Allow clicks to pass through */
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Keyframe animation for subtle star movement - fixed pixel values */
-        @keyframes moveStars {
-            from {
-                background-position: 0 0, 40px 60px, 130px 270px, 70px 180px, 200px 400px;
-            }
-            to {
-                background-position: 500px 500px, 340px 360px, 630px 770px, 370px 480px, 800px 900px;
-            }
+        /* Glassmorphic Panel Styles */
+        .glass-panel {
+            background: rgba(13, 16, 26, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
         }
 
-        /* Keyframe animation for chroma RGB effect on buttons and now "Namify" text */
-        @keyframes chromaShift {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.025);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Keyframe for loading spinner */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Common Styles for H2 and H3 within modals */
-        h2 {
-            margin-bottom: 20px;
-            font-size: 3.5em; /* Larger heading */
-            font-weight: 700; /* Bolder font */
-            letter-spacing: 2px; /* Spacing for impact */
-            /* RGB glow for "Namify" text */
-            text-shadow:
-                0 0 5px #ff0000, /* Red */
-                0 0 10px #00ff00, /* Green */
-                0 0 15px #0000ff; /* Blue */
-            animation: chromaShift 2s linear infinite; /* Apply RGB animation */
-            z-index: 1; /* Ensure it's above the particle canvas */
-        }
-
-        h2 .rgb-glow {
-            display: inline-block; /* Allows transform and shadow */
-            color: #ccc; /* Light grey color for BETA */
-            text-shadow: none; /* No text shadow for a flat look */
-            animation: none; /* No animation */
-        }
-
-
-        .modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 2em;
-            color: #fff;
-            text-align: center;
-        }
-
-        /* Input container for positioning clear button and counter */
-        .input-container {
-            position: relative;
-            width: 350px; /* Match input width */
-            margin-bottom: 20px;
-            z-index: 1; /* Ensure it's above the particle canvas */
-        }
-
-        /* Common Styles for Input Field (used throughout the app and modals) */
-        input {
-            padding: 15px 20px; /* Increased padding */
-            font-size: 1.1em; /* Slightly larger font */
-            width: 100%; /* Fill container */
-            box-sizing: border-box; /* Include padding in width */
-            border: 2px solid rgba(255, 255, 255, 0.3); /* Subtle border */
-            border-radius: 10px; /* More rounded corners */
-            outline: none;
-            background-color: rgba(255, 255, 255, 0.05); /* Slightly transparent background */
-            color: white;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
-        }
-
-        input:focus {
-            border-color: #00bcd4; /* Cyan border on focus */
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); /* Glowing shadow on focus */
-        }
-
-        /* Clear input button */
-        .clear-input {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.2em;
-            cursor: pointer;
-            padding: 5px;
-            display: none; /* Hidden by default */
-            transition: color 0.2s ease; /* Only color transition */
-        }
-
-        .clear-input:hover {
-            color: white;
-            background-color: transparent !important; /* Force no background */
-            border: none !important; /* Force no border */
-            box-shadow: none !important; /* Force no shadow */
-            transform: translateY(-50%) !important; /* Ensure no transform */
-        }
-
-        .clear-input:active {
-            background-color: transparent !important; /* Force no background */
-            border: none !important; /* Force no border */
-            box-shadow: none !important; /* Force no shadow */
-            transform: translateY(-50%) !important; /* Ensure no transform */
-        }
-
-        /* Character counter */
-        .char-counter {
-            position: absolute;
-            bottom: -18px; /* Position below input */
-            right: 5px;
-            font-size: 0.75em;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Common Styles for Buttons (used throughout the app and modals) */
-        button {
-            padding: 15px 30px; /* Increased padding */
-            font-size: 1.1em; /* Slightly larger font */
-            font-weight: 600; /* Bolder text */
-            background-color: #ffffff; /* Default white background */
-            color: #1e3c72; /* Darker blue text for contrast */
-            border: none;
-            border-radius: 10px; /* More rounded corners */
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* Smooth transitions */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
-            letter-spacing: 0.5px;
-            display: flex; /* For aligning text and spinner */
-            align-items: center;
-            justify-content: center;
-            gap: 10px; /* Space between text and spinner */
-            z-index: 1; /* Ensure it's above the particle canvas */
-        }
-
-        button:hover:not(:disabled) { /* Only hover if not disabled */
-            background-color: #ffffff; /* Keep white background for filter to work on */
-            animation: chromaShift 2s linear infinite; /* Apply the chroma animation */
-            transform: translateY(-3px) scale(1.02); /* Lift and slightly enlarge on hover */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Enhanced shadow on hover */
-        }
-
-        button:active:not(:disabled) { /* Only active if not disabled */
-            transform: translateY(0) scale(0.98); /* Press down effect */
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); /* Reduced shadow on press */
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Loading spinner (used throughout the app and modals) */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid #00bcd4; /* Cyan spinner */
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
-
-        /* Styles for the Output Area */
-        #output-container-wrapper { /* New wrapper for output and copy all button */
-            margin-top: 30px; /* More margin */
-            width: 90%; /* Wider output area */
-            max-width: 600px; /* Increased max width */
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 20px; /* Increased padding */
-            border-radius: 15px; /* More rounded corners */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1; /* Ensure it's above the particle canvas */
-        }
-
-        #output { /* Renamed to output-list */
-            list-style: none; /* Remove bullet points */
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            max-height: 350px; /* Increased max height */
-            overflow-y: auto; /* Enable scrolling for content */
-            font-family: 'Cascadia Code', 'Consolas', monospace; /* More distinct monospace font */
-            font-size: 0.95em; /* Slightly smaller font for code-like output */
-            line-height: 1.6; /* Better line spacing */
-            color: #e0e0e0; /* Lighter text for variations */
-            text-align: left; /* Align text left */
-        }
-
-        /* Webkit (Chrome, Safari) scrollbar styling */
-        #output::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #output::-webkit-scrollbar-track {
+        .glass-card:hover {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 240, 255, 0.15);
         }
 
-        #output::-webkit-scrollbar-thumb {
-            background-color: #2a5298;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.4);
         }
 
-        /* Individual output item */
-        .output-item {
-            display: flex;
-            flex-wrap: wrap; /* Allow items to wrap */
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtle separator */
+        /* Gradient Text Shimmer */
+        .text-gradient-cyan {
+            background: linear-gradient(135deg, #ffffff 0%, #00f0ff 60%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .output-item:last-child {
-            border-bottom: none;
+        /* Homoglyph highlight dot */
+        .homoglyph-char {
+            color: #00f0ff;
+            position: relative;
+            font-weight: 700;
         }
-
-        .output-item span {
-            flex-grow: 1; /* Allow text to take space */
-            word-break: break-all; /* Break long words */
-        }
-
-        .output-item .output-buttons {
-            display: flex;
-            gap: 5px; /* Space between copy and make account buttons */
-            margin-top: 5px; /* Space from username if wrapped */
-            width: 100%; /* Take full width on smaller screens */
-            justify-content: flex-end; /* Align buttons to the right */
-        }
-
-        @media (min-width: 480px) { /* Adjust for larger screens */
-            .output-item .output-buttons {
-                width: auto; /* Auto width on larger screens */
-                margin-top: 0;
-                justify-content: initial; /* Reset alignment */
-            }
-        }
-
-
-        .output-item .copy-individual-button,
-        .output-item .make-account-button { /* Apply common styles to both buttons */
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 0.9em;
-            transition: color 0.2s ease; /* Only color transition */
-            padding: 5px; /* Make clickable area larger */
-            box-shadow: none !important; /* Force no shadow */
-            transform: none !important; /* Ensure no transform */
-            display: flex; /* For SVG alignment */
-            align-items: center;
-            justify-content: center;
-        }
-
-        .output-item .copy-individual-button:hover,
-        .output-item .make-account-button:hover {
-            color: #00bcd4; /* Cyan on hover */
-            background-color: transparent !important; /* Force no background */
-            border: none !important; /* Force no border */
-            box-shadow: none !important; /* Force no shadow */
-            transform: none !important; /* Ensure no transform */
-        }
-
-        .output-item .copy-individual-button:active,
-        .output-item .make-account-button:active {
-            background-color: transparent !important; /* Force no background */
-            border: none !important; /* Force no border */
-            box-shadow: none !important; /* Force no shadow */
-            transform: none !important; /* Ensure no transform */
-        }
-
-        /* Message for no variations found */
-        .no-variations-message {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-        }
-
-        .copy-all-button-wrapper { /* Renamed for clarity */
-            margin-top: 15px; /* Space between output and copy all button */
-            position: relative; /* For tooltip positioning */
-        }
-
-        .copy-all-button-wrapper button { /* Styles for the main "Copy All" button */
-            padding: 10px 20px;
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #1e3c72;
-            background-color: #ffffff;
-        }
-
-        /* Copy confirmation message (tooltip) */
-        .copy-message {
+        .homoglyph-char::after {
+            content: '';
             position: absolute;
-            bottom: calc(100% + 10px); /* Position above the button */
+            bottom: -2px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 20; /* Ensure it's on top */
-        }
-
-        .copy-message.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-
-        /* --- Welcome Screen Specific Styles --- */
-        #welcomeScreen {
-            text-align: center;
-            transition: opacity 0.5s ease-in-out; /* Smooth fade out transition */
-            position: absolute; /* Position over mainApp */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex; /* Keep flex for centering content */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            /* Match body background for seamless transition - fixed pixel values */
-            background-color: #0a0a2a;
-            background-image:
-                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 30px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 40px),
-                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 25px),
-                radial-gradient(white, rgba(255,255,255,.05) 1px, transparent 20px),
-                radial-gradient(white, rgba(255,255,255,.12) 1px, transparent 35px);
-            background-size:
-                500px 500px,
-                300px 300px,
-                400px 400px,
-                200px 200px,
-                600px 600px;
-            background-position:
-                0 0,
-                40px 60px,
-                130px 270px,
-                70px 180px,
-                200px 400px;
-            animation: moveStars 100s linear infinite; /* Apply same star movement */
-            z-index: 10; /* Ensure it's on top initially */
-            cursor: pointer;
-            overflow: hidden; /* Hide overflow for warp effect */
-        }
-
-        /* Space portal animation */
-        .space-portal {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-        }
-
-        .portal-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid rgba(0, 188, 212, 0.3);
+            width: 3px;
+            height: 3px;
+            background: #00f0ff;
             border-radius: 50%;
-            animation: portalPulse 3s ease-in-out infinite;
+            box-shadow: 0 0 6px #00f0ff;
         }
 
-        .portal-ring:nth-child(1) {
-            animation-delay: 0s;
-            transform: scale(1);
-        }
-
-        .portal-ring:nth-child(2) {
-            animation-delay: 1s;
-            transform: scale(0.8);
-        }
-
-        .portal-ring:nth-child(3) {
-            animation-delay: 2s;
-            transform: scale(0.6);
-        }
-
-        @keyframes portalPulse {
-            0% {
-                transform: scale(0.6);
-                opacity: 0;
-                border-color: rgba(0, 188, 212, 0);
-            }
-            50% {
-                opacity: 1;
-                border-color: rgba(0, 188, 212, 0.6);
-            }
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
-                border-color: rgba(0, 188, 212, 0);
-            }
-        }
-
-        .welcome-title {
-            font-size: 5em;
-            margin-bottom: 20px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-shadow: 
-                0 0 20px rgba(0, 188, 212, 0.8),
-                0 0 40px rgba(0, 188, 212, 0.6),
-                0 0 60px rgba(0, 188, 212, 0.4);
-            animation: titleGlow 2s ease-in-out infinite alternate;
-            z-index: 2;
-            position: relative;
-        }
-
-        @keyframes titleGlow {
-            0% {
-                text-shadow: 
-                    0 0 20px rgba(0, 188, 212, 0.8),
-                    0 0 40px rgba(0, 188, 212, 0.6),
-                    0 0 60px rgba(0, 188, 212, 0.4);
-            }
-            100% {
-                text-shadow: 
-                    0 0 30px rgba(0, 188, 212, 1),
-                    0 0 50px rgba(0, 188, 212, 0.8),
-                    0 0 70px rgba(0, 188, 212, 0.6);
-            }
-        }
-
-        .welcome-subtitle {
-            font-size: 1.5em;
-            margin-bottom: 50px;
-            opacity: 0.8;
-            font-weight: 300;
-            letter-spacing: 2px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .click-indicator {
-            position: relative;
-            display: inline-block;
-            z-index: 2;
-        }
-
-        .pulse-ring {
-            position: absolute;
-            width: 150px;
-            height: 50px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 25px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulsate 2s ease-out infinite;
-        }
-
-        @keyframes pulsate {
-            0% {
-                transform: translate(-50%, -50%) scale(0.9);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1.3);
-                opacity: 0;
-            }
-        }
-
-        .click-text {
-            display: inline-block;
-            padding: 15px 40px;
-            font-size: 1.2em;
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 25px;
-            animation: clickPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes clickPulse {
-            0%, 100% {
-                opacity: 0.8;
-            }
-            50% {
-                opacity: 1;
-            }
-        }
-
-        /* Warp speed lines for transition */
-        .warp-lines-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow: hidden;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .warp-line {
-            position: absolute;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
-            height: 2px;
-            width: 0;
-            transform-origin: center left;
-            animation: warpSpeed 0.5s ease-out forwards;
-        }
-
-        @keyframes warpSpeed {
-            0% {
-                width: 0;
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                width: 200vw;
-                opacity: 0;
-            }
-        }
-
-        /* Space blast animation class */
+        /* Hyperspace Transition Styles */
         #welcomeScreen.space-blast {
-            animation: spaceBlast 1.5s ease-in forwards;
+            animation: spaceBlast 1.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
 
         @keyframes spaceBlast {
             0% {
-                transform: scale(1) rotateZ(0deg);
+                transform: scale(1);
                 opacity: 1;
             }
-            50% {
-                transform: scale(1.1) rotateZ(5deg);
-                opacity: 1;
+            40% {
+                transform: scale(1.15) rotate(4deg);
+                opacity: 0.95;
             }
             100% {
-                transform: scale(50) rotateZ(15deg);
+                transform: scale(35) rotate(20deg);
                 opacity: 0;
-            }
-        }
-
-        /* --- Main Application Specific Styles --- */
-        #mainApp {
-            opacity: 0; /* Initially hidden */
-            pointer-events: none; /* Disable interactions when hidden */
-            transition: opacity 0.5s ease-in-out; /* Smooth fade in transition */
-            display: flex; /* Always display as flex for layout */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%; /* Take full width */
-            height: 100%; /* Take full height */
-            position: absolute; /* Position over welcome screen initially */
-            top: 0;
-            left: 0;
-            z-index: 5; /* Below welcome screen initially */
-        }
-
-        #mainApp.visible {
-            opacity: 1; /* Show when visible */
-            pointer-events: all; /* Enable interactions */
-            z-index: 11; /* Bring to front after welcome screen fades */
-        }
-
-        /* Footer text styling */
-        .footer-text {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.6);
-            z-index: 12; /* Ensure it's above other elements */
-            pointer-events: none; /* Allow clicks to pass through */
-        }
-
-        /* Version number styling */
-        .version-text {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.6);
-            z-index: 12; /* Ensure it's above other elements */
-            pointer-events: none; /* Allow clicks to pass through */
-        }
-
-        /* Updates button styling */
-        .updates-button {
-            position: absolute;
-            top: 45px; /* Position below version number */
-            left: 20px;
-            padding: 5px 10px;
-            font-size: 0.75em;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 12;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        .updates-button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
-
-        /* Chatbot button styling */
-        .chatbot-button {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            padding: 12px 18px; /* Adjusted padding for icon and text */
-            font-size: 1.2em; /* Larger icon/text */
-            background-color: #4CAF50; /* Green for chat */
-            color: white;
-            border-radius: 50%; /* Make it round */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            z-index: 12;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px; /* Fixed width for round button */
-            height: 50px; /* Fixed height for round button */
-        }
-
-        .chatbot-button:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .chatbot-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-
-        /* Modal Overlay (used for all modals) */
-        .modal-overlay {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 100; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
-            display: flex; /* Use flex to center content */
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Modal Content Box (used for all modals) */
-        .modal-content {
-            background-color: #0a0a2a; /* Dark background matching body */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 30px;
-            position: relative;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh; /* Max height to allow scrolling */
-            overflow-y: auto; /* Enable scrolling for content */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: translateY(-20px); /* Initial slight lift */
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0); /* Drop into place */
-        }
-
-        /* Close Button (used for all modals) */
-        .close-button {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* Update Item Box */
-        .update-item {
-            background-color: rgba(255, 255, 255, 0.08); /* Slightly lighter background for each update */
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px; /* Space between updates */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            color: #e0e0e0;
-        }
-
-        .update-item:last-child {
-            margin-bottom: 0; /* No margin for the last item */
-        }
-
-        .update-item h4 {
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 1.2em;
-            color: #00bcd4; /* Cyan for version number */
-            font-weight: 600;
-        }
-
-        .update-item p {
-            margin: 0;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        /* Styles for Make Account Modal specific elements */
-        #makeAccountModal .modal-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        #makeAccountModal .modal-content h3 {
-            margin-bottom: 30px;
-        }
-
-        #makeAccountModal .modal-content .form-group {
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: left; /* Align labels left */
-        }
-
-        #makeAccountModal .modal-content label {
-            display: block;
-            font-size: 0.9em;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Input with copy button container */
-        #makeAccountModal .input-with-copy {
-            display: flex;
-            align-items: center;
-            gap: 5px; /* Space between input and button */
-            width: 100%;
-        }
-
-        #makeAccountModal .modal-content input[type="text"] {
-            flex-grow: 1; /* Allow input to take available space */
-            padding: 10px 15px;
-            font-size: 1em;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.08);
-            color: white;
-            text-align: center; /* Center text for selected username */
-        }
-
-        #makeAccountModal #modalUsernameInput {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            background-color: rgba(0, 188, 212, 0.1); /* Light cyan background */
-            border-color: #00bcd4;
-        }
-
-        /* Copy button within the modal */
-        #makeAccountModal .copy-modal-btn {
-            background-color: #00bcd4; /* Cyan for copy buttons */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px; /* Square button */
-            width: 35px; /* Fixed width for icon */
-            height: 35px; /* Fixed height for icon */
-            cursor: pointer;
-            font-size: 0.8em;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0; /* Prevent button from shrinking */
-        }
-
-        #makeAccountModal .copy-modal-btn:hover {
-            background-color: #00aabf;
-            transform: translateY(-1px);
-        }
-        #makeAccountModal .copy-modal-btn:active {
-            transform: translateY(0);
-        }
-
-
-        #makeAccountModal #generateAccountDetailsButton {
-            margin-top: 20px;
-            margin-bottom: 30px;
-            padding: 12px 25px;
-            font-size: 1em;
-        }
-
-        #makeAccountModal .generated-details-section {
-            width: 100%;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        #makeAccountModal .generated-details-section h4 {
-            font-size: 1.8em;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        #makeAccountModal .disclaimer-text {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 20px;
-            line-height: 1.4;
-        }
-
-        /* New button for Epic Games link */
-        #createEpicAccountButton {
-            margin-top: 25px; /* Space from generated details */
-            padding: 12px 25px;
-            font-size: 1em;
-            background-color: #00bcd4; /* Cyan color for Epic Games button */
-            color: white;
-            box-shadow: 0 4px 8px rgba(0, 188, 212, 0.4);
-        }
-
-        #createEpicAccountButton:hover {
-            background-color: #00aabf; /* Slightly darker cyan on hover */
-            animation: none; /* Disable chroma shift for this button if it's a direct link */
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 6px 10px rgba(0, 188, 212, 0.5);
-        }
-        #createEpicAccountButton:active {
-            transform: translateY(0) scale(0.99);
-            box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3);
-        }
-
-        /* Download PDF button specific styles */
-        #downloadPdfButton {
-            margin-top: 15px; /* Space from Epic Games button */
-            background-color: #ff5722; /* Orange color for PDF button */
-            color: white;
-            box-shadow: 0 4px 8px rgba(255, 87, 34, 0.4);
-        }
-
-        #downloadPdfButton:hover {
-            background-color: #e64a19; /* Slightly darker orange on hover */
-            animation: none;
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 6px 10px rgba(255, 87, 34, 0.5);
-        }
-        #downloadPdfButton:active {
-            transform: translateY(0) scale(0.99);
-            box-shadow: 0 2px 4px rgba(255, 87, 34, 0.3);
-        }
-
-
-        /* Chatbot Modal Specific Styles */
-        #chatbotModal .modal-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 70vh; /* Make chat modal taller */
-            max-height: 80vh;
-            padding-bottom: 10px; /* Adjust padding for input area */
-        }
-
-        #chatHistory {
-            flex-grow: 1;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-message {
-            padding: 8px 12px;
-            border-radius: 12px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-
-        .chat-message.user {
-            background-color: #007bff; /* Blue for user messages */
-            align-self: flex-end;
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .chat-message.gemini {
-            background-color: #28a745; /* Green for Gemini messages */
-            align-self: flex-start;
-            color: white;
-            border-bottom-left-radius: 2px;
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            padding: 0 10px; /* Padding to align with chat history */
-        }
-
-        #chatInput {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1em;
-        }
-
-        #chatInput::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        #sendChatButton {
-            padding: 10px 15px;
-            font-size: 1em;
-            background-color: #00bcd4; /* Cyan send button */
-            color: white;
-            border-radius: 8px;
-            box-shadow: none; /* No extra shadow */
-        }
-
-        #sendChatButton .spinner {
-            margin-left: 5px;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            h2 {
-                font-size: 2.5em;
-            }
-            .input-container {
-                width: 80%;
-            }
-            input {
-                font-size: 1em;
-                padding: 12px 15px;
-            }
-            button {
-                font-size: 1em;
-                padding: 12px 25px;
-            }
-            #output-container-wrapper {
-                width: 95%;
-                padding: 15px;
-            }
-            #output {
-                font-size: 0.9em;
-            }
-            .welcome-title {
-                font-size: 3.5em;
-                letter-spacing: 2px;
-            }
-            .welcome-subtitle {
-                font-size: 1.2em;
-                max-width: 90%;
-                margin-bottom: 40px;
-            }
-            .space-portal {
-                width: 250px;
-                height: 250px;
-            }
-            .click-text {
-                font-size: 1em;
-                padding: 12px 30px;
-            }
-            .footer-text {
-                font-size: 0.75em;
-                bottom: 10px;
-                right: 10px;
-            }
-            .version-text {
-                font-size: 0.75em;
-                top: 10px;
-                left: 10px;
-            }
-            .updates-button {
-                font-size: 0.65em;
-                top: 35px; /* Adjust position for smaller font */
-                left: 10px;
-                padding: 3px 8px;
-            }
-            .chatbot-button {
-                bottom: 15px;
-                left: 15px;
-                width: 45px;
-                height: 45px;
-                font-size: 1em;
-            }
-            .modal-content {
-                padding: 20px;
-            }
-            .modal-content h3 {
-                font-size: 1.5em;
-            }
-            .close-button {
-                font-size: 24px;
-                top: 5px;
-                right: 10px;
-            }
-            .update-item {
-                padding: 10px;
-            }
-            .update-item h4 {
-                font-size: 1.1em;
-            }
-            .update-item p {
-                font-size: 0.85em;
-            }
-            #makeAccountModal .modal-content input[type="text"] {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-            #makeAccountModal #modalUsernameInput {
-                font-size: 1.1em;
-            }
-            #makeAccountModal .generated-details-section h4 {
-                font-size: 1.5em;
-            }
-            #makeAccountModal .modal-content label {
-                font-size: 0.8em;
-            }
-            #makeAccountModal .disclaimer-text {
-                font-size: 0.7em;
-            }
-            #createEpicAccountButton {
-                padding: 10px 20px;
-                font-size: 0.9em;
-            }
-            #chatbotModal .modal-content {
-                height: 75vh;
-            }
-            #chatInput {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-            #sendChatButton {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h2 {
-                font-size: 2em;
-            }
-            .input-container {
-                width: 90%;
-            }
-            .welcome-title {
-                font-size: 2.5em;
-                letter-spacing: 1px;
-            }
-            .welcome-subtitle {
-                font-size: 1em;
-                margin-bottom: 30px;
-            }
-            .space-portal {
-                width: 200px;
-                height: 200px;
-            }
-            .click-text {
-                font-size: 0.9em;
-                padding: 10px 25px;
-                letter-spacing: 2px;
-            }
-            .pulse-ring {
-                width: 120px;
-                height: 40px;
-            }
-            .chatbot-button {
-                bottom: 10px;
-                left: 10px;
-                width: 40px;
-                height: 40px;
-                font-size: 0.9em;
+                pointer-events: none;
             }
         }
     </style>
 </head>
-<body>
-    <!-- Particle Canvas -->
+<body class="min-h-screen flex flex-col font-sans overflow-x-hidden antialiased selection:bg-brand-cyan/30 selection:text-white">
+
+    <!-- Particle Starfield Canvas -->
     <canvas id="particleCanvas"></canvas>
 
-    <!-- Welcome Screen Section -->
-    <div id="welcomeScreen" onclick="initiateSpaceJourney()">
-        <div class="space-portal">
-            <div class="portal-ring"></div>
-            <div class="portal-ring"></div>
-            <div class="portal-ring"></div>
+    <!-- ============================================================== -->
+    <!-- 🚀 INTERACTIVE SPACE WELCOME PORTAL -->
+    <!-- ============================================================== -->
+    <div id="welcomeScreen" onclick="initiateSpaceJourney()" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 cursor-pointer bg-[#06070b] transition-all duration-700">
+        
+        <!-- Ambient Radial Aura -->
+        <div class="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-brand-cyan/20 via-brand-purple/20 to-transparent blur-[120px] pointer-events-none animate-pulse-slow"></div>
+
+        <!-- Concentric Cyber Portal Rings -->
+        <div class="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center mb-8">
+            <div class="absolute inset-0 rounded-full border border-brand-cyan/20 animate-[spin_18s_linear_infinite]"></div>
+            <div class="absolute inset-4 rounded-full border border-dashed border-brand-purple/30 animate-[spin_26s_linear_infinite_reverse]"></div>
+            <div class="absolute inset-10 rounded-full border border-brand-cyan/40 animate-ping opacity-25"></div>
+            
+            <!-- Central Gateway Core -->
+            <div class="relative w-36 h-36 rounded-full bg-black/60 border border-white/20 backdrop-blur-2xl flex flex-col items-center justify-center shadow-[0_0_50px_rgba(0,240,255,0.3)] group-hover:scale-105 transition-transform">
+                <svg class="w-12 h-12 text-brand-cyan drop-shadow-[0_0_12px_rgba(0,240,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span class="text-[10px] font-mono tracking-widest text-white/50 mt-1 uppercase">v0.17 PRO</span>
+            </div>
         </div>
-        <h1 class="welcome-title">READY TO BREAK THROUGH?</h1>
-        <p class="welcome-subtitle">Click anywhere to blast into the Namify universe</p>
-        <div class="click-indicator">
-            <span class="pulse-ring"></span>
-            <span class="click-text">CLICK TO LAUNCH</span>
+
+        <!-- Typography -->
+        <div class="text-center relative z-10 max-w-xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-brand-cyan mb-4">
+                <span class="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                CLOAKED GAMERTAG ENGINE
+            </div>
+            
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-3 text-gradient-cyan">
+                READY TO BREAK THROUGH?
+            </h1>
+            
+            <p class="text-sm sm:text-base text-white/60 mb-8 font-light max-w-md mx-auto">
+                Generate authentic lookalike usernames using Cyrillic homoglyphs. Completely undetectable by duplicate checks.
+            </p>
+
+            <!-- Action Button / Trigger -->
+            <div class="inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-cyan to-brand-purple text-black font-bold text-sm tracking-wider shadow-[0_0_30px_rgba(0,240,255,0.4)] hover:shadow-[0_0_50px_rgba(0,240,255,0.7)] transition-all transform hover:scale-105">
+                <span>CLICK ANYWHERE TO LAUNCH</span>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </div>
+            
+            <div class="mt-6">
+                <button onclick="event.stopPropagation(); skipToApp();" class="text-xs text-white/40 hover:text-white underline underline-offset-4 transition-colors">
+                    Skip intro sequence &rarr;
+                </button>
+            </div>
         </div>
-        <!-- Warp speed lines container -->
-        <div id="warpLines" class="warp-lines-container"></div>
+
+        <!-- Warp Speed Lines Layer -->
+        <div id="warpLines" class="fixed inset-0 pointer-events-none opacity-0 transition-opacity duration-300 overflow-hidden"></div>
     </div>
 
-    <!-- Main Application Section (Initially Hidden) -->
-    <div id="mainApp">
-        <h2>Namify <span class="rgb-glow">BETA</span></h2>
-        <div class="input-container">
-            <input type="text" id="usernameInput" placeholder="Enter username..." aria-label="Enter username for variations" maxlength="16">
-            <button class="clear-input" onclick="clearInput()" aria-label="Clear input">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+    <!-- ============================================================== -->
+    <!-- ⚡ MAIN APPLICATION DASHBOARD -->
+    <!-- ============================================================== -->
+    <div id="mainApp" class="relative z-10 flex-1 flex flex-col opacity-0 pointer-events-none transition-opacity duration-500">
+        
+        <!-- Top Navbar -->
+        <header class="w-full border-b border-white/[0.06] bg-black/30 backdrop-blur-xl sticky top-0 z-30">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                
+                <!-- Logo & Version -->
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-cyan to-brand-purple p-[1px] shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                        <div class="w-full h-full rounded-[11px] bg-[#090b10] flex items-center justify-center">
+                            <span class="font-black text-brand-cyan text-base">N</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-lg tracking-tight text-white">Namify</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30">
+                                v0.17
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-white/40 font-mono hidden sm:block">Homoglyph Matrix Generator</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Action Buttons -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="openUpdatesModal()" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-semibold text-white/80 hover:text-white transition-all cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-brand-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        </svg>
+                        <span>Changelog</span>
+                    </button>
+
+                    <button onclick="openChatbotModal()" class="flex items-center gap-2 px-4 py-1.5 rounded-xl bg-gradient-to-r from-brand-cyan/20 to-brand-purple/20 hover:from-brand-cyan/30 hover:to-brand-purple/30 border border-brand-cyan/30 text-xs font-bold text-white shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-all cursor-pointer">
+                        <span class="text-brand-cyan">✨</span>
+                        <span>AI Assistant</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Content -->
+        <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
+            
+            <!-- Hero Generator Card -->
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-60 h-60 rounded-full bg-brand-cyan/10 blur-[60px] pointer-events-none"></div>
+
+                <div class="text-center max-w-lg mx-auto mb-6">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
+                        Create Your Stealth Gamertag
+                    </h2>
+                    <p class="text-xs sm:text-sm text-white/50 leading-relaxed">
+                        Enter any username to craft visually identical variations with genuine unicode homoglyphs.
+                    </p>
+                </div>
+
+                <!-- Input Field Component -->
+                <div class="max-w-xl mx-auto space-y-4">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="usernameInput"
+                            placeholder="Enter username (e.g. Ninja, Ghost, Phoenix)..."
+                            maxlength="16"
+                            autocomplete="off"
+                            class="w-full px-5 py-4 rounded-2xl bg-black/50 border border-white/10 text-white placeholder-white/30 text-base sm:text-lg font-mono focus:outline-none focus:border-brand-cyan focus:ring-2 focus:ring-brand-cyan/20 transition-all pr-24 shadow-inner"
+                        />
+                        
+                        <!-- Right-aligned Actions inside Input -->
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                            <button
+                                id="clearButton"
+                                onclick="clearInput()"
+                                class="hidden p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                                title="Clear"
+                            >
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 6 6 18M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            
+                            <!-- Live Character Counter -->
+                            <span id="charCounter" class="text-xs font-mono px-2 py-1 rounded-md bg-white/5 text-white/50 border border-white/5">
+                                0/16
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Generator Action Button & Modes -->
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <button
+                            id="generateButton"
+                            onclick="generateHomoglyphs()"
+                            class="w-full sm:flex-1 flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl bg-white text-black font-bold text-sm hover:bg-white/90 shadow-[0_4px_20px_rgba(255,255,255,0.25)] transition-all transform active:scale-95 cursor-pointer disabled:opacity-50"
+                        >
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/>
+                                <path d="m14 7 3 3"/>
+                                <path d="M5 6v4"/>
+                                <path d="M19 14v4"/>
+                                <path d="M10 2v2"/>
+                                <path d="M7 8H3"/>
+                                <path d="M21 16h-4"/>
+                                <path d="M11 3H9"/>
+                            </svg>
+                            <span id="generateButtonText">Generate Variations</span>
+                            <div id="generateSpinner" class="hidden w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                        </button>
+
+                        <div class="flex items-center gap-2 text-xs text-white/50 font-mono">
+                            <kbd class="px-2 py-1 rounded bg-white/5 border border-white/10 text-white/70">Enter</kbd>
+                            <span>to run</span>
+                        </div>
+                    </div>
+
+                    <!-- Supported Letters Legend -->
+                    <div class="pt-2 flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-white/40 font-mono">
+                        <span>Replaces:</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">a &rarr; а</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">e &rarr; е</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">o &rarr; о</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">c &rarr; с</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">p &rarr; р</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">x &rarr; х</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">y &rarr; у</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">s &rarr; ѕ</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/5 text-brand-cyan">i &rarr; і</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 📋 OUTPUT & VARIATIONS SECTION -->
+            <!-- ============================================================== -->
+            <div id="outputContainer" class="hidden space-y-4">
+                
+                <!-- Stats & Action Toolbar -->
+                <div class="flex flex-wrap items-center justify-between gap-3 px-2">
+                    <div class="flex items-center gap-2">
+                        <span id="resultsCountBadge" class="text-xs font-mono px-3 py-1 rounded-full bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20">
+                            0 Variations Found
+                        </span>
+                        <span class="text-xs text-white/40">&bull; Click any row to copy</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button
+                            onclick="copyAllOutput()"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                        >
+                            <svg class="w-3.5 h-3.5 text-brand-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                            </svg>
+                            <span>Copy All</span>
+                        </button>
+
+                        <button
+                            onclick="downloadTextList()"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-semibold text-white/70 hover:text-white transition-colors cursor-pointer"
+                            title="Export as Text"
+                        >
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" x2="12" y1="15" y2="3"/>
+                            </svg>
+                            <span>TXT</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Variations List Container -->
+                <div class="glass-panel rounded-3xl p-3 sm:p-4 max-h-[500px] overflow-y-auto space-y-2" id="outputList">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Easter Egg Banner Area -->
+            <div id="easterEggContainer" class="hidden"></div>
+
+        </main>
+
+        <!-- Modern Footer -->
+        <footer class="w-full border-t border-white/[0.06] py-6 text-center text-xs text-white/40 space-y-2">
+            <p>Created by <span class="text-white/80 font-mono">@Kfzv</span> & <span class="text-white/80 font-mono">@fuckpanpan</span> on Discord</p>
+            <p class="text-[11px] text-white/20">Namify BETA &bull; Homoglyph Cryptographic Visual Simulation</p>
+        </footer>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 🔑 CREATE ACCOUNT DETAILS MODAL -->
+    <!-- ============================================================== -->
+    <div id="makeAccountModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 relative shadow-2xl animate-in zoom-in-95 duration-200">
+            
+            <!-- Close Button -->
+            <button onclick="closeMakeAccountModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18M6 6l12 12"/>
                 </svg>
             </button>
-            <span class="char-counter" id="charCounter">0/16</span>
-        </div>
-        <button id="generateButton" onclick="generateHomoglyphs()" aria-label="Generate Username Variations">
-            Generate Variations
-            <span class="spinner" id="generateSpinner"></span>
-        </button>
-        
-        <div id="output-container-wrapper">
-            <ul id="output"></ul> <!-- Changed to ul for list items -->
-            <div class="copy-all-button-wrapper">
-                <button id="copyAllButton" onclick="copyAllOutput()" aria-label="Copy all generated variations to clipboard">Copy All</button>
-                <span id="copyMessage" class="copy-message">Copied!</span>
-            </div>
-        </div>
 
-        <!-- Footer text -->
-        <div class="footer-text">
-            @Kfzv and @fuckpanpan on Discord
-        </div>
-
-        <!-- Version number text -->
-        <div class="version-text">
-            V0.16
-        </div>
-
-        <!-- Updates button -->
-        <button class="updates-button" onclick="openUpdatesModal()" aria-label="View application updates history">Updates?</button>
-
-        <!-- Chatbot button -->
-        <button class="chatbot-button" onclick="openChatbotModal()" aria-label="Open chatbot to chat with Gemini">
-            ✨
-        </button>
-    </div>
-
-    <!-- Updates Modal -->
-    <div id="updatesModal" class="modal-overlay">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="updatesModalTitle">
-            <span class="close-button" onclick="closeUpdatesModal()" aria-label="Close updates history">&times;</span>
-            <h3 id="updatesModalTitle">Updates History</h3>
-            <div class="updates-list">
-                <!-- Update V0.16 -->
-                <div class="update-item">
-                    <h4>V0.16 - Enhanced Email Generation & Pause/Resume Control</h4>
-                    <p>
-                        Major improvements to email generation and extension control!
-                        <br><br>
-                        **Email Improvements:**
-                        <ul>
-                            <li>**Numbers in ALL emails**: Every generated email now includes numbers for maximum uniqueness (no more simple john.smith emails).</li>
-                            <li>**Expanded name database**: From 24 to 80+ first names and last names for much more variety.</li>
-                            <li>**7 different email patterns**: Including patterns with middle initials and various number placements.</li>
-                            <li>**Better uniqueness**: Emails like james.smith342, emma.a.thompson3847, or david428brown for less chance of duplicates.</li>
-                        </ul>
-                        <br>
-                        **Extension Updates:**
-                        <ul>
-                            <li>**Pause/Resume button**: Pause auto-fill while creating your Outlook account, then resume when ready!</li>
-                            <li>**Manual date of birth**: Extension now skips the DOB page entirely - fill it manually as requested.</li>
-                            <li>**Improved reliability**: Better email field detection and form filling logic.</li>
-                        </ul>
-                    </p>
+            <!-- Modal Header -->
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
                 </div>
-                <!-- Update V0.15 -->
-                <div class="update-item">
-                    <h4>V0.15 - Epic Games Auto-Fill Extension!</h4>
-                    <p>
-                        Introducing the Namify Epic Games Auto-Fill Chrome Extension - your ultimate companion for seamless account creation!
-                        <br><br>
-                        **Key Features:**
-                        <ul>
-                            <li>**Automatic Date of Birth**: The extension automatically fills the age verification with a random adult date (1990-2005).</li>
-                            <li>**Complete Form Auto-Fill**: All registration fields are filled instantly - email, username, password, first/last name, and even checkboxes!</li>
-                            <li>**Seamless Integration**: The extension receives account details directly from Namify - no manual copying needed.</li>
-                            <li>**Smart Name Detection**: Automatically extracts first and last names from the generated email address.</li>
-                            <li>**One-Click Registration**: Just click "Open Epic Games Registration" and watch the magic happen!</li>
-                        </ul>
-                        Install the extension from the new 'namify-epic-autofill' folder to supercharge your Epic Games account creation!
-                    </p>
-                </div>
-                <!-- Update V0.14 -->
-                <div class="update-item">
-                    <h4>V0.14 - The Realistic Account Generation Update!</h4>
-                    <p>
-                        Namify's account generation now creates ultra-realistic credentials that look and feel authentic!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Realistic Email Addresses:** Now generates authentic-looking emails exclusively using outlook.com with realistic name combinations like "john.smith@outlook.com" or "sarah_johnson2019@outlook.com"</li>
-                            <li>**Smart Email Patterns:** Uses various realistic patterns including firstname.lastname, initials+lastname, and username-based combinations with years or numbers.</li>
-                            <li>**User-Friendly Passwords:** Passwords are now more memorable while still secure! They combine readable words with numbers and symbols (e.g., "QuickTiger482@" or "Storm#Bold789") instead of random gibberish.</li>
-                            <li>**Enhanced Security:** All passwords still meet strict security requirements with uppercase, lowercase, numbers, and special characters - just in a more user-friendly format.</li>
-                            <li>**Better Compatibility:** Uses commonly accepted special characters (!@#$%&*) to ensure passwords work across all platforms.</li>
-                        </ul>
-                        Your generated accounts now look like they could belong to real people!
-                    </p>
-                </div>
-                <!-- Update V0.13 -->
-                <div class="update-item">
-                    <h4>V0.13 - The Immersive Space Journey Update!</h4>
-                    <p>
-                        Get ready for blast-off! Namify now features an epic space launch sequence that transforms your entry into the app.
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Immersive Welcome Experience:** The welcome screen now features a pulsating space portal with the provocative message "READY TO BREAK THROUGH?" Click anywhere to initiate your journey!</li>
-                            <li>**Space Warp Animation:** Experience a thrilling warp-speed effect as you're "blasted" through space with dynamic light trails and particle effects.</li>
-                            <li>**Enhanced Visual Design:** The welcome screen showcases glowing cyan accents, animated portal rings, and a pulsating "CLICK TO LAUNCH" indicator for maximum impact.</li>
-                            <li>**Smooth Transition Effects:** The journey from welcome to the main app is now a cinematic experience with scaling, rotation, and explosive particle animations.</li>
-                            <li>**Responsive Space Portal:** The immersive experience adapts beautifully to all screen sizes, ensuring everyone gets the full cosmic journey.</li>
-                        </ul>
-                        Prepare for launch - your username generation experience just became an intergalactic adventure!
-                    </p>
-                </div>
-                <!-- Update V0.12 -->
-                <div class="update-item">
-                    <h4>V0.12 - Extension Integration!</h4>
-                    <p>
-                        Namify now actively communicates with its companion Chrome extension!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Automatic Extension Updates:** When you generate account details within the "Create Account Details" modal, Namify will now automatically send these details to the Chrome extension. If the extension's pop-up is open, it will update in real-time!</li>
-                            <li>**Seamless Workflow:** This creates a more integrated experience, reducing manual steps and making it even faster to get your generated details into the extension.</li>
-                            <li>**Under-the-Hood Communication:** Implemented secure `window.postMessage` to send data from the Namify app to the extension's content script, which then forwards it to the extension's pop-up.</li>
-                        </ul>
-                        Ensure your Chrome extension is also updated to V1.1 (or later) for this feature to work correctly!
-                    </p>
-                </div>
-                <!-- Update V0.11 -->
-                <div class="update-item">
-                    <h4>V0.11 - In-App Copy Convenience!</h4>
-                    <p>
-                        We've made copying your generated account details even easier, directly within the Namify app!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Direct Copy Buttons in Account Modal:** You no longer need a separate Chrome extension to copy individual details! Dedicated "copy" buttons have been added right next to the generated email and password fields in the "Create Account Details" modal.</li>
-                            <li>**Streamlined Workflow:** This enhancement provides a practical way to store and manage your newly generated credentials, improving the overall utility of the account creation simulation.</li>
-                            <li>**Minor UI Adjustments:** Subtle styling tweaks have been applied to ensure the new copy buttons blend seamlessly with the existing modal design.</li>
-                        </ul>
-                        Namify continues to evolve with your convenience in mind!
-                    </p>
-                </div>
-                <!-- Update V0.10 -->
-                <div class="update-item">
-                    <h4>V0.10 - The PDF Export Update!</h4>
-                    <p>
-                        Namify now empowers you with the ability to export your generated account details!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**PDF Export for Account Details:** A new "Download PDF" button has been added to the "Create Account Details" modal. You can now easily save your generated username, email, and password into a convenient PDF document for safekeeping.</li>
-                            <li>**Enhanced Usability:** This feature provides a practical way to store and manage your newly generated credentials, improving the overall utility of the account creation simulation.</li>
-                            <li>**Minor Code Refinements:** Continued optimization of the codebase ensures smooth integration and reliable performance of the new PDF generation functionality.</li>
-                        </ul>
-                        Namify is constantly evolving to provide you with more powerful and user-friendly tools!
-                    </p>
-                </div>
-                <!-- Update V0.09 -->
-                <div class="update-item">
-                    <h4>V0.09 - The Cosmic Dust Update!</h4>
-                    <p>
-                        Namify now features a mesmerizing new background effect to deepen its celestial theme!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Subtle Particle System:** A dynamic particle system has been integrated into the background. Watch as tiny, glowing particles gently float, fade, and shimmer, adding an ethereal and immersive sense of depth to the application.</li>
-                            <li>**Performance Optimizations:** The new particle system is designed to be lightweight and efficient, ensuring smooth performance without impacting the app's responsiveness.</li>
-                            <li>**Minor Visual Refinements:** Further small adjustments to element positioning and layering have been made to ensure the new background effect harmonizes perfectly with the existing UI.</li>
-                        </ul>
-                        We're continuously working to make your Namify experience as visually captivating as it is functional!
-                    </p>
-                </div>
-                <!-- Update V0.08 -->
-                <div class="update-item">
-                    <h4>V0.08 - The Dual Glow Revival!</h4>
-                    <p>
-                        The Namify app is now even more visually striking with a return to its luminous roots!
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**"Namify" Text RGB Glow:** The primary "Namify" heading now pulses with the captivating RGB glow, bringing back a dynamic and futuristic aesthetic.</li>
-                            <li>**"BETA" Text Consistency:** The "BETA" text retains its subtle light grey color, providing a balanced visual contrast to the glowing "Namify" title.</li>
-                            <li>**Minor Visual Tweaks:** Further small adjustments have been made to ensure optimal visual harmony and responsiveness across all display sizes.</li>
-                            <li>**Stability Enhancements:** Continued efforts to refine the codebase have resulted in improved stability and a smoother user experience.</li>
-                        </ul>
-                        We're committed to making your username generation experience as visually engaging as it is functional!
-                    </p>
-                </div>
-                <!-- Update V0.07 -->
-                <div class="update-item">
-                    <h4>V0.07 - The Subtlety Refinement Update!</h4>
-                    <p>
-                        We've fine-tuned the aesthetics for a more refined visual experience.
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**"BETA" Text Recolor:** The "BETA" text in the main heading now sports a sophisticated light grey color, offering a softer contrast while maintaining its distinct presence. The vibrant RGB glow has been gracefully retired for a more understated elegance.</li>
-                            <li>**Minor UI Polish:** Further subtle adjustments to element spacing and visual hierarchies have been implemented, ensuring a cleaner and more harmonious interface.</li>
-                            <li>**Under-the-Hood Optimizations:** Our engineers have continued to streamline the codebase, resulting in even more efficient resource utilization and a smoother overall application flow.</li>
-                        </ul>
-                        Namify continues its journey towards visual perfection and seamless functionality!
-                    </p>
-                </div>
-                <!-- Update V0.06 -->
-                <div class="update-item">
-                    <h4>V0.06 - The Chromatic Brilliance Update!</h4>
-                    <p>
-                        Prepare for a visual spectacle! Namify BETA now dazzles with an electrifying new effect.
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**RGB Glow on "BETA":** The "BETA" text in the main heading now pulsates with a mesmerizing RGB glow, adding a vibrant and futuristic touch to your Namify experience. It's not just a name generator; it's a light show!</li>
-                            <li>**Further Performance Optimizations:** We've tweaked the cosmic engines even further, ensuring lightning-fast responses and buttery-smooth animations across all devices, from ancient scrolls to quantum supercomputers.</li>
-                            <li>**Subtle UI Refinements:** Minor adjustments to spacing and alignment have been implemented, enhancing the overall aesthetic balance and ensuring every pixel is perfectly aligned with the celestial grid.</li>
-                            <li>**Quantum Bug Annihilation:** Our dedicated team of interdimensional debuggers has obliterated several elusive, quantum-level bugs that were previously undetectable. The app is now more stable than a neutron star!</li>
-                        </ul>
-                        Your journey through the naming cosmos just got a whole lot brighter!
-                    </p>
-                </div>
-                <!-- Update V0.05 -->
-                <div class="update-item">
-                    <h4>V0.05 - The Conversational Companion Update!</h4>
-                    <p>
-                        Namify BETA just got a whole lot smarter! We've integrated a powerful new feature to enhance your naming journey.
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Gemini Chatbot Integration:** Say hello to your new AI companion! A sparkling "✨" button in the bottom-left corner now opens a dedicated chat modal, allowing you to converse directly with the Gemini LLM. Ask it anything, from naming advice to existential questions about homoglyphs!</li>
-                            <li>**Streamlined Output Interface:** To make room for our brilliant new chatbot, we've removed the individual "Get Lore" buttons from each username. Don't worry, the spirit of lore lives on within the chatbot!</li>
-                            <li>**Enhanced Responsiveness:** Further optimizations for seamless performance across all devices, ensuring your experience is as smooth as a freshly generated username.</li>
-                            <li>**Invisible Pixie Dust (Minor Bug Fixes):** Our diligent developers have sprinkled magical pixie dust to eliminate various microscopic glitches, ensuring a more stable and enchanting user experience.</li>
-                        </ul>
-                        We're constantly evolving to bring you the best username generation experience in the known universe!
-                    </p>
-                </div>
-                <!-- Update V0.04 -->
-                <div class="update-item">
-                    <h4>V0.04 - The Galactic Polish & Security Update!</h4>
-                    <p>
-                        Behold, Namify BETA has ascended to V0.04! We've meticulously polished every cosmic pixel, ensuring a smoother, more intuitive journey through the username galaxy.
-                        <br><br>
-                        **Key Enhancements:**
-                        <ul>
-                            <li>**Hyper-Randomized Email Generation:** Our email generator now taps into the quantum realm, producing truly unique and unpredictable email prefixes. No two generated emails will ever be alike, guaranteeing peak digital anonymity (for simulation purposes, of course!).</li>
-                            <li>**Fortress-Grade Password Protocol:** Passwords are now a formidable 15 characters, meticulously crafted to meet universal security standards. Expect a robust blend of uppercase, lowercase, numbers, and special characters – a digital impenetrable shield!</li>
-                            <li>**Seamless Account Creation Gateway:** A direct portal to Epic Games registration has been integrated into the "Make Account Details" modal. Generate your details, then warp directly to account creation!</li>
-                            <li>**Lore Weaver (AI-Powered):** Introducing the mystical "✨ Get Lore" button! Our advanced AI now weaves a unique, fantastical origin story for each generated username, adding a layer of depth and intrigue to your digital identity.</li>
-                            <li>**Refined Focus Management:** We've fine-tuned the modal interactions, ensuring your focus effortlessly glides back to the correct element after closing pop-up messages. No more getting lost in the digital void!</li>
-                            <li>**Whispers from the Void (Minor Bug Fixes):** Our cosmic janitors have swept away several tiny, lingering anomalies, enhancing overall stability and responsiveness across all dimensions.</li>
-                        </ul>
-                        Prepare for an even more stellar Namify experience!
-                    </p>
-                </div>
-                <!-- Update V0.03 -->
-                <div class="update-item">
-                    <h4>V0.03 - The Initial UI/UX Overhaul & Account Feature Introduction</h4>
-                    <p>
-                        This version marked a significant leap forward! We introduced a completely revamped user interface, with dynamic background animations and improved button feedback to make your experience more engaging. The homoglyph generation logic was enhanced to support uppercase characters and a broader spectrum of unicode letters, expanding your creative possibilities. Crucially, the "Make Account" feature was first introduced, providing simulated secure email and password generation, along with initial text changes for clarity.
-                    </p>
-                </div>
-                <!-- Update V0.02 -->
-                <div class="update-item">
-                    <h4>V0.02</h4>
-                    <p>Enhanced UI Design, Welcome Screen, Footer Text, Version Number, Chroma Buttons, 16-Character Limit, Caps-Friendly Generator, Easter Eggs (PanPan, Sinny)</p>
-                </div>
-                <!-- Update V0.01 -->
-                <div class="update-item">
-                    <h4>V0.01</h4>
-                    <p>Boring ass generator</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Make Account Modal -->
-    <div id="makeAccountModal" class="modal-overlay">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="makeAccountModalTitle">
-            <span class="close-button" onclick="closeMakeAccountModal()" aria-label="Close account creation form">&times;</span>
-            <h3 id="makeAccountModalTitle">Create Account Details</h3>
-
-            <div class="form-group">
-                <label for="modalUsernameInput">Selected Username:</label>
-                <input type="text" id="modalUsernameInput" readonly>
+                <h3 class="text-xl font-bold text-white">Generate Account Identity</h3>
+                <p class="text-xs text-white/50 mt-1">Realistic credentials matched with your cloaked username</p>
             </div>
 
-            <button id="generateAccountDetailsButton" onclick="generateAccountDetails()">
-                <span id="modalAccountButtonText">Generate Account Details</span>
-                <span id="modalLoadingSpinner" class="spinner"></span>
-            </button>
+            <!-- Username Display Card -->
+            <div class="p-3.5 rounded-2xl bg-black/60 border border-white/10 flex items-center justify-between mb-5">
+                <div>
+                    <span class="text-[10px] font-mono text-white/40 uppercase tracking-wider block">Target Username</span>
+                    <span id="modalUsernameInput" class="font-mono text-sm sm:text-base font-bold text-brand-cyan"></span>
+                </div>
+                <button onclick="copyTextToClipboard(document.getElementById('modalUsernameInput').textContent, 'Username copied!')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer" title="Copy Username">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                    </svg>
+                </button>
+            </div>
 
-            <div class="generated-details-section">
-                <h4>Generated Details</h4>
-                <div class="form-group">
-                    <label for="modalGeneratedEmail">Email:</label>
-                    <div class="input-with-copy">
-                        <input type="text" id="modalGeneratedEmail" readonly placeholder="Email will appear here">
-                        <button class="copy-modal-btn" onclick="copyTextToClipboard(document.getElementById('modalGeneratedEmail').value)" aria-label="Copy generated email">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+            <!-- Generated Fields -->
+            <div class="space-y-3.5 mb-6">
+                <!-- Email Field -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-medium text-white/60">Realistic Outlook Email</label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="text"
+                            id="modalGeneratedEmail"
+                            readonly
+                            placeholder="Click generate below..."
+                            class="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-white/30 text-xs sm:text-sm font-mono focus:outline-none pr-12"
+                        />
+                        <button onclick="copyTextToClipboard(document.getElementById('modalGeneratedEmail').value, 'Email copied!')" class="absolute right-2 p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="modalGeneratedPassword">Password:</label>
-                    <div class="input-with-copy">
-                        <input type="text" id="modalGeneratedPassword" readonly placeholder="Password will appear here">
-                        <button class="copy-modal-btn" onclick="copyTextToClipboard(document.getElementById('modalGeneratedPassword').value)" aria-label="Copy generated password">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                <!-- Password Field -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-medium text-white/60">Memorable Secure Password</label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="text"
+                            id="modalGeneratedPassword"
+                            readonly
+                            placeholder="Click generate below..."
+                            class="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white placeholder-white/30 text-xs sm:text-sm font-mono focus:outline-none pr-12"
+                        />
+                        <button onclick="copyTextToClipboard(document.getElementById('modalGeneratedPassword').value, 'Password copied!')" class="absolute right-2 p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
                             </svg>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <button id="createEpicAccountButton" onclick="window.open('https://www.epicgames.com/id/register/date-of-birth', '_blank')" aria-label="Go to Epic Games registration page">
-                Create Account on Epic Games
-            </button>
+            <!-- Action Buttons -->
+            <div class="space-y-2.5">
+                <button
+                    id="generateAccountDetailsButton"
+                    onclick="generateAccountDetails()"
+                    class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-purple hover:opacity-95 text-black font-bold text-xs tracking-wide shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                    <span id="modalAccountButtonText">Generate Identity Details</span>
+                    <div id="modalLoadingSpinner" class="hidden w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                </button>
 
-            <button id="downloadPdfButton" onclick="downloadAccountDetailsPdf()" aria-label="Download generated account details as PDF">
-                Download PDF
-            </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button
+                        onclick="window.open('https://www.epicgames.com/id/register/date-of-birth', '_blank')"
+                        class="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/10 border border-white/10 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                        <span>Open Epic Games</span>
+                        <svg class="w-3.5 h-3.5 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        </svg>
+                    </button>
 
-            <p class="disclaimer-text">
-                Note: This "Generate Account Details" feature creates realistic-looking email addresses and secure passwords for demonstration purposes only. The emails are randomly generated and may or may not be available. Always verify email availability when creating real accounts.
+                    <button
+                        onclick="downloadAccountDetailsPdf()"
+                        class="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/10 border border-white/10 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                        <span>Export PDF</span>
+                        <svg class="w-3.5 h-3.5 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" x2="12" y1="15" y2="3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-[10px] text-white/40 text-center mt-4 leading-relaxed">
+                Extension Sync: Details are automatically broadcasted via <code class="text-brand-cyan">postMessage</code> to companion auto-fill extensions.
             </p>
         </div>
     </div>
 
-    <!-- Custom Message Box (for account generation modal) -->
-    <div id="modalAccountMessageBox" class="modal-overlay">
-        <div class="modal-content">
-            <p id="modalAccountMessageContent" class="mb-4"></p>
-            <button id="closeModalAccountMessageBox" onclick="closeModalAccountMessageBox()">OK</button>
+    <!-- ============================================================== -->
+    <!-- 📜 UPDATES / CHANGELOG MODAL -->
+    <!-- ============================================================== -->
+    <div id="updatesModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 relative shadow-2xl max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
+            
+            <button onclick="closeUpdatesModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="mb-4">
+                <h3 class="text-xl font-bold text-white">Changelog & Version History</h3>
+                <p class="text-xs text-white/50">Tracking improvements from v0.01 to current</p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-4 pr-2">
+                <!-- V0.17 -->
+                <div class="p-4 rounded-2xl bg-brand-cyan/[0.05] border border-brand-cyan/20 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-brand-cyan">V0.17 - The Modern Obsidian Redesign</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-brand-cyan/20 text-brand-cyan font-bold">LATEST</span>
+                    </div>
+                    <p class="text-xs text-white/70 leading-relaxed">
+                        Complete luxury overhaul: Deep space glassmorphism, visual character diff highlighting which letters are replaced, confetti animations, enhanced mobile responsiveness, and refined identity generators.
+                    </p>
+                </div>
+
+                <!-- V0.16 -->
+                <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <span class="text-xs font-bold text-white">V0.16 - Enhanced Email Generation & Pause/Resume</span>
+                    <p class="text-xs text-white/60 leading-relaxed">
+                        Added numbers to all generated emails for maximum uniqueness, expanded database to 80+ first and last names with 7 pattern variations.
+                    </p>
+                </div>
+
+                <!-- V0.15 -->
+                <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <span class="text-xs font-bold text-white">V0.15 - Epic Games Auto-Fill Extension</span>
+                    <p class="text-xs text-white/60 leading-relaxed">
+                        Automated date of birth selection, comprehensive registration field auto-filling, and direct postMessage communication.
+                    </p>
+                </div>
+
+                <!-- V0.14 -->
+                <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <span class="text-xs font-bold text-white">V0.14 - Realistic Account Generation</span>
+                    <p class="text-xs text-white/60 leading-relaxed">
+                        Created ultra-realistic Outlook address formats and memorable word-based passwords instead of random gibberish.
+                    </p>
+                </div>
+
+                <!-- V0.13 -->
+                <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                    <span class="text-xs font-bold text-white">V0.13 - Space Portal Launch Experience</span>
+                    <p class="text-xs text-white/60 leading-relaxed">
+                        Pulsating cosmic portal gateway with hypersonic warp effects.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Chatbot Modal -->
-    <div id="chatbotModal" class="modal-overlay">
-        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="chatbotModalTitle">
-            <span class="close-button" onclick="closeChatbotModal()" aria-label="Close chatbot">&times;</span>
-            <h3 id="chatbotModalTitle">Chat with Gemini</h3>
-            <div id="chatHistory">
-                <div class="chat-message gemini">Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!</div>
+    <!-- ============================================================== -->
+    <!-- 💬 GEMINI AI CHATBOT MODAL -->
+    <!-- ============================================================== -->
+    <div id="chatbotModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative shadow-2xl h-[600px] max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
+            
+            <button onclick="closeChatbotModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <!-- Chat Header -->
+            <div class="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center text-black font-black text-sm">
+                    ✨
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-white">Namify AI Assistant</h3>
+                    <p class="text-[11px] text-white/40">Powered by Gemini 2.0 Flash</p>
+                </div>
             </div>
-            <div class="chat-input-container">
-                <input type="text" id="chatInput" placeholder="Type your message..." aria-label="Type your message to Gemini">
-                <button id="sendChatButton" onclick="sendMessageToGemini()">
-                    Send
-                    <span class="spinner" id="chatSpinner"></span>
+
+            <!-- Chat Message Bubbles -->
+            <div id="chatHistory" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 text-xs leading-relaxed">
+                <div class="p-3 rounded-2xl bg-white/[0.04] border border-white/5 text-white/80 max-w-[85%]">
+                    Hello! I'm your Namify AI assistant. I can help you come up with creative gamer tags, suggest clan names, or explain how unicode homoglyphs work!
+                </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 scrollbar-none">
+                <button onclick="sendQuickPrompt('Suggest 5 aesthetic gamertags for competitive FPS')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] text-white/70 transition-colors cursor-pointer">
+                    FPS Gamer Tags
+                </button>
+                <button onclick="sendQuickPrompt('Explain how Cyrillic homoglyphs bypass username filters')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] text-white/70 transition-colors cursor-pointer">
+                    How Homoglyphs Work
+                </button>
+            </div>
+
+            <!-- Chat Input Bar -->
+            <div class="flex items-center gap-2">
+                <input
+                    type="text"
+                    id="chatInput"
+                    placeholder="Ask Gemini anything..."
+                    class="flex-1 px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:border-brand-cyan"
+                />
+                <button
+                    id="sendChatButton"
+                    onclick="sendMessageToGemini()"
+                    class="px-4 py-2.5 rounded-xl bg-brand-cyan text-black font-bold text-xs hover:bg-brand-cyan/90 transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                >
+                    <span>Send</span>
+                    <div id="chatSpinner" class="hidden w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Toast Notification Banner -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="px-4 py-2.5 rounded-2xl bg-white text-black font-semibold text-xs shadow-2xl flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span id="toastMessage">Copied!</span>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- 🧠 CORE LOGIC & HOMOGLYPH ENGINE -->
+    <!-- ============================================================== -->
     <script>
-        // Define homoglyph mappings
+        // Full Homoglyph Dictionary
         const homoglyphs = {
             'a': ['a', 'а'], // Latin 'a' vs Cyrillic 'а'
             'e': ['e', 'е'], // Latin 'e' vs Cyrillic 'е'
@@ -1594,345 +690,190 @@
             'p': ['p', 'р'], // Latin 'p' vs Cyrillic 'р'
             'x': ['x', 'х'], // Latin 'x' vs Cyrillic 'х'
             'y': ['y', 'у'], // Latin 'y' vs Cyrillic 'у'
-            's': ['s', 'ѕ'], // Latin 's' vs Cyrillic 'ѕ' (Cyrillic Dze)
-            'i': ['i', 'і']  // Latin 'i' vs Cyrillic dotted 'і'
+            's': ['s', 'ѕ'], // Latin 's' vs Cyrillic 'ѕ'
+            'i': ['i', 'і']  // Latin 'i' vs Cyrillic 'і'
         };
 
-        // Mapping for lowercase Cyrillic to their uppercase equivalents
         const cyrillicUppercaseMap = {
-            'а': 'А',
-            'е': 'Е',
-            'о': 'О',
-            'с': 'С',
-            'р': 'Р',
-            'х': 'Х',
-            'у': 'У',
-            'ѕ': 'Ѕ',
-            'і': 'І'
+            'а': 'А', 'е': 'Е', 'о': 'О', 'с': 'С', 'р': 'Р',
+            'х': 'Х', 'у': 'У', 'ѕ': 'Ѕ', 'і': 'І'
         };
 
-        let lastFocusedElement = null; // To store the element that had focus before modal opened
-        let chatHistory = [{ role: "model", parts: [{ text: "Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!" }] }]; // Initialize chat history
+        let generatedVariations = [];
+        let chatHistory = [{
+            role: "model",
+            parts: [{ text: "Hello! I'm Gemini. How can I assist you with your usernames today? Feel free to ask me for naming ideas, lore, or anything else!" }]
+        }];
 
-        /**
-         * Generates a realistic-looking email address using Microsoft domains.
-         * @param {string} username - The base username to incorporate.
-         * @returns {string} A realistic email address.
-         */
-        function generateRealisticEmail(username) {
-            // Only use outlook.com domain
-            const domain = 'outlook.com';
+        // Toast Helper
+        function showToast(message = "Copied to clipboard!") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-12', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
             
-            // Common first names for realistic combinations
-            const firstNames = ['james', 'john', 'robert', 'michael', 'william', 'david', 'richard', 'joseph', 
-                               'thomas', 'charles', 'mary', 'patricia', 'jennifer', 'linda', 'liz', 
-                               'barbara', 'susan', 'jessica', 'sarah', 'karen', 'alex', 'sam', 'chris', 'jordan',
-                               'daniel', 'matthew', 'anthony', 'mark', 'donald', 'steven', 'paul', 'andrew',
-                               'joshua', 'kenneth', 'kevin', 'brian', 'george', 'edward', 'ronald', 'timothy',
-                               'jason', 'jeffrey', 'ryan', 'jacob', 'gary', 'nick', 'eric', 'stephen',
-                               'jon', 'larry', 'justin', 'scott', 'brandon', 'frank', 'ben', 'greg',
-                               'ray', 'samuel', 'patrick', 'alex', 'jack', 'dennis', 'jerry', 'tyler',
-                               'aaron', 'henry', 'doug', 'jose', 'peter', 'adam', 'kyle', 'noah', 'nathan',
-                               'emma', 'olivia', 'ava', 'sophia', 'bella', 'mia', 'charlie', 'luna',
-                               'ella', 'liz', 'sofia', 'emily', 'avery', 'mila', 'scarlett', 'ellie'];
-            
-            // Common last names
-            const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis',
-                              'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson',
-                              'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson',
-                              'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson', 'walker',
-                              'young', 'allen', 'king', 'wright', 'scott', 'torres', 'nguyen', 'hill',
-                              'flores', 'green', 'adams', 'nelson', 'baker', 'hall', 'rivera', 'campbell',
-                              'mitchell', 'carter', 'roberts', 'gomez', 'phillips', 'evans', 'turner', 'diaz',
-                              'parker', 'cruz', 'edwards', 'collins', 'reyes', 'stewart', 'morris', 'morales',
-                              'murphy', 'cook', 'rogers', 'ortiz', 'morgan', 'cooper', 'peterson',
-                              'bailey', 'reed', 'kelly', 'howard', 'ramos', 'kim', 'cox', 'ward', 'rich'];
-            
-            // Email patterns - ALL include numbers for uniqueness
-            const patterns = [
-                () => {
-                    // firstname.lastname + number
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const num = Math.floor(Math.random() * 999) + 100; // 100-1099
-                    return `${firstName}.${lastName}${num}`;
-                },
-                () => {
-                    // firstnamelastname + random number
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const num = Math.floor(Math.random() * 9999) + 1000; // 1000-10999
-                    return `${firstName}${lastName}${num}`;
-                },
-                () => {
-                    // firstname_lastname + year
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const year = Math.floor(Math.random() * 25) + 1995; // Years 1995-2020
-                    const num = Math.floor(Math.random() * 99) + 1;
-                    return `${firstName}_${lastName}${year}_${num}`;
-                },
-                () => {
-                    // initial + lastname + bigger number
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const num = Math.floor(Math.random() * 99999) + 10000; // 10000-109999
-                    return `${firstName.charAt(0)}${lastName}${num}`;
-                },
-                () => {
-                    // username-based with more numbers
-                    let cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    // Truncate username if too long to ensure total length stays under 64
-                    if (cleanUsername.length > 40) {
-                        cleanUsername = cleanUsername.substring(0, 40);
-                    }
-                    const num1 = Math.floor(Math.random() * 999) + 100;
-                    const num2 = Math.floor(Math.random() * 99) + 10;
-                    return `${cleanUsername}${num1}_${num2}`;
-                },
-                () => {
-                    // firstname + number + lastname
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const num = Math.floor(Math.random() * 999) + 100;
-                    return `${firstName}${num}${lastName}`;
-                },
-                () => {
-                    // firstname.initial.lastname + number
-                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    const middleInitial = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // a-z
-                    const num = Math.floor(Math.random() * 9999) + 1000;
-                    return `${firstName}.${middleInitial}.${lastName}${num}`;
-                }
-            ];
-            
-            // Select a random pattern and generate email
-            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-            let emailPrefix = pattern();
-            
-            // Ensure email doesn't exceed Outlook's 64 character limit for local part
-            if (emailPrefix.length > 64) {
-                // Fallback to simple pattern if too long
-                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-                const num = Math.floor(Math.random() * 9999) + 1000;
-                emailPrefix = `${firstName}${num}`;
-            }
-            
-            return `${emailPrefix}@${domain}`;
+            setTimeout(() => {
+                toast.classList.add('translate-y-12', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2200);
         }
 
-        /**
-         * Generates a secure but more user-friendly password.
-         * Creates passwords that are easier to remember while meeting security requirements.
-         * @param {number} length - The desired length of the password (12-16 recommended).
-         * @returns {string} A secure password.
-         */
-        function generateSecurePassword(length = 14) {
-            // Word components for better memorability
-            const words = ['Star', 'Moon', 'Fire', 'Ice', 'Wind', 'Storm', 'Light', 'Dark', 'Sky', 'Ocean',
-                          'Tiger', 'Eagle', 'Wolf', 'Bear', 'Lion', 'Dragon', 'Phoenix', 'Hawk', 'Shark', 'Fox',
-                          'Blue', 'Red', 'Gold', 'Silver', 'Green', 'Black', 'White', 'Purple', 'Orange', 'Cyan'];
-            
-            const adjectives = ['Quick', 'Smart', 'Strong', 'Brave', 'Bright', 'Swift', 'Bold', 'Wise', 'Cool', 'Epic'];
-            
-            // Special characters that are commonly accepted
-            const commonSpecials = ['!', '@', '#', '$', '%', '&', '*'];
-            
-            // Generate password components
-            const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-            const word = words[Math.floor(Math.random() * words.length)];
-            const number = Math.floor(Math.random() * 999) + 1;
-            const special = commonSpecials[Math.floor(Math.random() * commonSpecials.length)];
-            
-            // Different password patterns
-            const patterns = [
-                `${adjective}${word}${number}${special}`,
-                `${word}${special}${adjective}${number}`,
-                `${number}${adjective}${word}${special}`,
-                `${special}${word}${number}${adjective}`,
-                `${adjective}${number}${special}${word}`
-            ];
-            
-            let password = patterns[Math.floor(Math.random() * patterns.length)];
-            
-            // Add extra random characters if needed to reach desired length
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
-            while (password.length < length) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            // Ensure it's not too long
-            if (password.length > length) {
-                password = password.substring(0, length);
-            }
-            
-            return password;
-        }
-
-
-        /**
-         * Updates the character counter and shows/hides the clear button.
-         */
-        function updateInputUI() {
-            const inputElement = document.getElementById('usernameInput');
-            const charCounter = document.getElementById('charCounter');
-            const clearButton = document.querySelector('.clear-input');
-            const maxLength = inputElement.maxLength;
-            const currentLength = inputElement.value.length;
-
-            charCounter.textContent = `${currentLength}/${maxLength}`;
-
-            if (currentLength > 0) {
-                clearButton.style.display = 'block';
-            } else {
-                clearButton.style.display = 'none';
-            }
-        }
-
-        /**
-         * Clears the input field.
-         */
-        function clearInput() {
-            document.getElementById('usernameInput').value = '';
-            updateInputUI(); // Update counter and clear button state
-            document.getElementById('output').innerHTML = ''; // Clear output
-            document.getElementById('copyAllButton').style.display = 'none'; // Hide copy all button
-            // No "Copied!" message needed for clearing input.
-        }
-
-        /**
-         * Copies text to clipboard using document.execCommand.
-         * @param {string} text - The text to copy.
-         * @param {HTMLElement | null} messageElement - The element to show "Copied!" message (optional).
-         */
-        function copyTextToClipboard(text, messageElement = null) {
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = text;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
+        // Copy Text Helper
+        function copyTextToClipboard(text, customToast) {
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(customToast || "Copied to clipboard!");
+                try {
+                    confetti({
+                        particleCount: 30,
+                        spread: 50,
+                        origin: { y: 0.8 },
+                        colors: ['#00f0ff', '#8b5cf6', '#ffffff']
+                    });
+                } catch (e) {}
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
                 document.execCommand('copy');
-                if (messageElement) {
-                    messageElement.classList.add('show');
-                    setTimeout(() => {
-                        messageElement.classList.remove('show');
-                    }, 1500); // Hide message after 1.5 seconds
-                }
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-            } finally {
-                document.body.removeChild(tempTextArea);
+                document.body.removeChild(ta);
+                showToast(customToast || "Copied!");
+            });
+        }
+
+        // Space Journey Launch Sequence
+        function initiateSpaceJourney() {
+            const welcome = document.getElementById('welcomeScreen');
+            const mainApp = document.getElementById('mainApp');
+            const warp = document.getElementById('warpLines');
+
+            welcome.style.pointerEvents = 'none';
+            warp.style.opacity = '1';
+
+            // Spawn warp acceleration lines
+            for (let i = 0; i < 40; i++) {
+                const line = document.createElement('div');
+                line.className = 'absolute bg-gradient-to-r from-transparent via-brand-cyan to-transparent h-[2px] opacity-70';
+                line.style.width = '120px';
+                line.style.top = Math.random() * 100 + 'vh';
+                line.style.left = Math.random() * 100 + 'vw';
+                line.style.transform = `rotate(${Math.random() * 360}deg)`;
+                warp.appendChild(line);
+            }
+
+            welcome.classList.add('space-blast');
+            setTimeout(() => {
+                mainApp.classList.remove('opacity-0', 'pointer-events-none');
+                mainApp.classList.add('opacity-100');
+                welcome.style.display = 'none';
+            }, 900);
+        }
+
+        function skipToApp() {
+            const welcome = document.getElementById('welcomeScreen');
+            const mainApp = document.getElementById('mainApp');
+            welcome.style.display = 'none';
+            mainApp.classList.remove('opacity-0', 'pointer-events-none');
+            mainApp.classList.add('opacity-100');
+        }
+
+        // Input UI updater
+        function updateInputUI() {
+            const input = document.getElementById('usernameInput');
+            const counter = document.getElementById('charCounter');
+            const clearBtn = document.getElementById('clearButton');
+            const len = input.value.length;
+
+            counter.textContent = `${len}/16`;
+            if (len > 0) {
+                clearBtn.classList.remove('hidden');
+                if (len >= 16) counter.classList.add('text-amber-400');
+                else counter.classList.remove('text-amber-400');
+            } else {
+                clearBtn.classList.add('hidden');
             }
         }
 
-        /**
-         * Copies all generated variations to the clipboard.
-         */
-        function copyAllOutput() {
-            const outputListItems = document.querySelectorAll('#output .output-item span');
-            if (outputListItems.length === 0) return;
-
-            let allVariationsText = '';
-            outputListItems.forEach(item => {
-                allVariationsText += item.textContent + '\n';
-            });
-
-            copyTextToClipboard(allVariationsText.trim(), document.getElementById('copyMessage'));
+        function clearInput() {
+            const input = document.getElementById('usernameInput');
+            input.value = '';
+            updateInputUI();
+            document.getElementById('outputContainer').classList.add('hidden');
+            document.getElementById('easterEggContainer').classList.add('hidden');
+            input.focus();
         }
 
-        /**
-         * Copies a single variation to the clipboard.
-         * @param {HTMLElement} buttonElement - The button element that was clicked.
-         */
-        function copyIndividualVariation(buttonElement) {
-            // Find the parent output-item and then get the span containing the variation text
-            const outputItem = buttonElement.closest('.output-item');
-            const variationText = outputItem.querySelector('span').textContent;
-            
-            // Copy to clipboard
-            copyTextToClipboard(variationText);
-            
-            // Visual feedback: temporarily change the button icon to a checkmark
-            const originalHTML = buttonElement.innerHTML;
-            buttonElement.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                </svg>
-            `;
-            buttonElement.style.color = '#4CAF50'; // Green color for success
-            
-            // Restore original icon after 1 second
-            setTimeout(() => {
-                buttonElement.innerHTML = originalHTML;
-                buttonElement.style.color = ''; // Reset to default color
-            }, 1000);
-        }
-
-
-        /**
-         * Generates homoglyph variations of the input username.
-         * Displays the results in the #output div.
-         */
+        // Core Homoglyph Variation Generator
         function generateHomoglyphs() {
-            const inputElement = document.getElementById('usernameInput');
-            const outputList = document.getElementById('output'); // Changed to outputList
-            const copyAllButton = document.getElementById('copyAllButton');
-            const generateButton = document.getElementById('generateButton');
-            const generateSpinner = document.getElementById('generateSpinner');
+            const input = document.getElementById('usernameInput').value.trim();
+            const normalized = input.toLowerCase();
+            const outputContainer = document.getElementById('outputContainer');
+            const outputList = document.getElementById('outputList');
+            const easterEggContainer = document.getElementById('easterEggContainer');
+            const countBadge = document.getElementById('resultsCountBadge');
+            const btn = document.getElementById('generateButton');
+            const spinner = document.getElementById('generateSpinner');
+            const btnText = document.getElementById('generateButtonText');
 
-            const input = inputElement.value;
-            const normalizedInput = input.toLowerCase();
+            if (!input) {
+                showToast("Please enter a username first!");
+                return;
+            }
 
-            // Show loading state
-            generateButton.disabled = true;
-            generateSpinner.style.display = 'block';
-            outputList.innerHTML = ''; // Clear previous results
-            copyAllButton.style.display = 'none'; // Hide copy all button initially
+            // Spinner feedback
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            btnText.textContent = "Synthesizing...";
 
-            // Simulate a delay for demonstration of loading spinner
             setTimeout(() => {
-                // Easter Egg 1: PanPan
-                if (normalizedInput === "panpan") {
-                    outputList.innerHTML = `<li class="no-variations-message">Snowy's mom aint got no teeth so you know its slippin</li>`;
-                    copyAllButton.style.display = 'none'; // Hide copy button for easter eggs
-                    generateButton.disabled = false;
-                    generateSpinner.style.display = 'none';
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                btnText.textContent = "Generate Variations";
+
+                // Easter Egg 1: panpan
+                if (normalized === "panpan") {
+                    outputContainer.classList.add('hidden');
+                    easterEggContainer.classList.remove('hidden');
+                    easterEggContainer.innerHTML = `
+                        <div class="glass-panel rounded-3xl p-6 border-amber-500/30 bg-amber-500/[0.05] text-center space-y-2">
+                            <span class="text-3xl">🦷</span>
+                            <h4 class="text-base font-bold text-amber-300">Easter Egg Unlocked</h4>
+                            <p class="text-xs text-white/70">"Snowy's mom aint got no teeth so you know its slippin"</p>
+                        </div>
+                    `;
                     return;
                 }
 
-                // Easter Egg 2: Sinny
-                if (normalizedInput === "sinny") {
-                    outputList.innerHTML = `<li class="no-variations-message">You Typed This Name Because You Know You Love Me</li>`;
-                    copyAllButton.style.display = 'none'; // Hide copy button for easter eggs
-                    generateButton.disabled = false;
-                    generateSpinner.style.display = 'none';
+                // Easter Egg 2: sinny
+                if (normalized === "sinny") {
+                    outputContainer.classList.add('hidden');
+                    easterEggContainer.classList.remove('hidden');
+                    easterEggContainer.innerHTML = `
+                        <div class="glass-panel rounded-3xl p-6 border-brand-purple/30 bg-brand-purple/[0.05] text-center space-y-2">
+                            <span class="text-3xl">💜</span>
+                            <h4 class="text-base font-bold text-purple-300">Sinny's Place Easter Egg</h4>
+                            <p class="text-xs text-white/70">"You Typed This Name Because You Know You Love Me"</p>
+                        </div>
+                    `;
                     return;
                 }
 
-                // Original homoglyph generation logic
-                if (!input) {
-                    outputList.innerHTML = `<li class="no-variations-message">Please enter a username to generate variations.</li>`;
-                    generateButton.disabled = false;
-                    generateSpinner.style.display = 'none';
-                    return;
-                }
+                easterEggContainer.classList.add('hidden');
 
+                // Homoglyph Permutation Logic
                 let results = [''];
                 for (let char of input) {
                     const lowerChar = char.toLowerCase();
-                    let variantsForChar = homoglyphs[lowerChar] || [char];
+                    const variantsForChar = homoglyphs[lowerChar] || [char];
 
                     let temp = [];
                     for (let base of results) {
                         for (let variant of variantsForChar) {
                             let finalVariant = variant;
                             if (char === char.toUpperCase() && char !== char.toLowerCase()) {
-                                if (cyrillicUppercaseMap[variant]) {
-                                    finalVariant = cyrillicUppercaseMap[variant];
-                                } else {
-                                    finalVariant = variant.toUpperCase();
-                                }
+                                finalVariant = cyrillicUppercaseMap[variant] || variant.toUpperCase();
                             }
                             temp.push(base + finalVariant);
                         }
@@ -1940,598 +881,445 @@
                     results = temp;
                 }
 
-                // Filter out the original input if it exists in results
-                const filtered = results.filter(v => v !== input);
+                // Exclude the exact original input
+                generatedVariations = results.filter(v => v !== input);
 
-                if (filtered.length > 0) {
-                    // Display results as list items with individual copy and make account buttons
-                    outputList.innerHTML = ``; // Clear before adding new items
-                    filtered.forEach(variation => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'output-item';
-                        
-                        // Create elements programmatically to avoid issues with quotes in variation names
-                        const span = document.createElement('span');
-                        span.textContent = variation;
-                        
-                        const buttonsDiv = document.createElement('div');
-                        buttonsDiv.className = 'output-buttons';
-                        
-                        // Copy button
-                        const copyButton = document.createElement('button');
-                        copyButton.className = 'copy-individual-button';
-                        copyButton.setAttribute('aria-label', `Copy ${variation} to clipboard`);
-                        copyButton.onclick = function() { copyIndividualVariation(this); };
-                        copyButton.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
-                            </svg>
-                        `;
-                        
-                        // Make account button
-                        const makeAccountButton = document.createElement('button');
-                        makeAccountButton.className = 'make-account-button';
-                        makeAccountButton.setAttribute('aria-label', `Create account with username ${variation}`);
-                        makeAccountButton.onclick = function() { openMakeAccountModal(variation); };
-                        makeAccountButton.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                            </svg>
-                        `;
-                        
-                        buttonsDiv.appendChild(copyButton);
-                        buttonsDiv.appendChild(makeAccountButton);
-                        
-                        listItem.appendChild(span);
-                        listItem.appendChild(buttonsDiv);
-                        outputList.appendChild(listItem);
-                    });
-                    copyAllButton.style.display = 'block'; // Show copy all button
+                outputList.innerHTML = '';
+                if (generatedVariations.length === 0) {
+                    countBadge.textContent = "0 Variations";
+                    outputList.innerHTML = `
+                        <div class="text-center py-12 text-white/40 space-y-2">
+                            <p class="text-xs">No homoglyphs available for "${input}". Try names with letters like: a, e, o, c, p, x, y, s, i.</p>
+                        </div>
+                    `;
                 } else {
-                    outputList.innerHTML = `<li class="no-variations-message">No homoglyph variations found for "${input}". Try a different name, or one with common letters like 'a', 'e', 'o'.</li>`;
-                    copyAllButton.style.display = 'none'; // Hide copy all button
+                    countBadge.textContent = `${generatedVariations.length} Lookalikes Generated`;
+                    
+                    generatedVariations.forEach((variation, idx) => {
+                        // Count swapped characters & render visual diff
+                        let swappedCount = 0;
+                        let diffHtml = '';
+                        for (let i = 0; i < variation.length; i++) {
+                            const origChar = input[i];
+                            const varChar = variation[i];
+                            if (origChar !== varChar) {
+                                swappedCount++;
+                                diffHtml += `<span class="homoglyph-char">${varChar}</span>`;
+                            } else {
+                                diffHtml += `<span>${varChar}</span>`;
+                            }
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = "glass-card p-3 sm:p-4 rounded-2xl flex items-center justify-between gap-4 cursor-pointer group";
+                        card.onclick = () => copyTextToClipboard(variation);
+
+                        card.innerHTML = `
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="text-xs font-mono text-white/30 w-6 shrink-0">#${idx + 1}</span>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-mono text-sm sm:text-base font-semibold text-white tracking-wide truncate group-hover:text-brand-cyan transition-colors">
+                                        ${diffHtml}
+                                    </span>
+                                    <span class="text-[10px] text-white/40 font-mono">
+                                        ${swappedCount} letter${swappedCount > 1 ? 's' : ''} cloaked with Cyrillic
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 shrink-0" onclick="event.stopPropagation()">
+                                <button
+                                    onclick="copyTextToClipboard('${variation}')"
+                                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                                    title="Copy Gamertag"
+                                >
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                                    </svg>
+                                </button>
+                                
+                                <button
+                                    onclick="openMakeAccountModal('${variation}')"
+                                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-cyan/15 hover:bg-brand-cyan/25 text-brand-cyan border border-brand-cyan/30 text-xs font-semibold transition-all"
+                                    title="Create Identity"
+                                >
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                    <span class="hidden sm:inline">Account</span>
+                                </button>
+                            </div>
+                        `;
+                        outputList.appendChild(card);
+                    });
                 }
 
-                // Hide loading state
-                generateButton.disabled = false;
-                generateSpinner.style.display = 'none';
-            }, 500); // Simulate 0.5 second loading time
+                outputContainer.classList.remove('hidden');
+            }, 300);
         }
 
-        /**
-         * Initiates the immersive space journey transition from welcome to main app.
-         * Creates a warp speed effect and blast animation.
-         */
-        function initiateSpaceJourney() {
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            const mainApp = document.getElementById('mainApp');
-            const warpLinesContainer = document.getElementById('warpLines');
-            
-            // Prevent multiple clicks during animation
-            welcomeScreen.style.pointerEvents = 'none';
-            
-            // Create warp speed lines
-            warpLinesContainer.style.opacity = '1';
-            
-            // Generate multiple warp lines from center
-            for (let i = 0; i < 50; i++) {
-                const line = document.createElement('div');
-                line.className = 'warp-line';
-                
-                // Random position around center
-                const angle = (Math.PI * 2 * i) / 50;
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-                const radius = Math.random() * 100;
-                
-                line.style.left = (centerX + Math.cos(angle) * radius) + 'px';
-                line.style.top = (centerY + Math.sin(angle) * radius) + 'px';
-                line.style.transform = `rotate(${angle}rad)`;
-                line.style.animationDelay = `${i * 0.01}s`;
-                
-                warpLinesContainer.appendChild(line);
-            }
-            
-            // Add space blast class after a short delay
-            setTimeout(() => {
-                welcomeScreen.classList.add('space-blast');
-                
-                // Start fading in the main app
-                mainApp.classList.add('visible');
-                
-                // Enhanced particle effect during transition
-                createBlastParticles();
-            }, 500);
-            
-            // Complete transition
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-                // Clear warp lines
-                warpLinesContainer.innerHTML = '';
-            }, 2000);
-        }
-        
-        /**
-         * Creates additional particle effects during the space blast transition.
-         */
-        function createBlastParticles() {
-            const canvas = document.getElementById('particleCanvas');
-            const ctx = canvas.getContext('2d');
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            
-            // Create blast particles from center
-            for (let i = 0; i < 100; i++) {
-                const angle = (Math.PI * 2 * i) / 100;
-                const velocity = Math.random() * 10 + 5;
-                
-                const particle = {
-                    x: centerX,
-                    y: centerY,
-                    vx: Math.cos(angle) * velocity,
-                    vy: Math.sin(angle) * velocity,
-                    radius: Math.random() * 3 + 1,
-                    opacity: 1,
-                    life: 0,
-                    maxLife: 60
-                };
-                
-                particles.push(particle);
-            }
+        function copyAllOutput() {
+            if (generatedVariations.length === 0) return;
+            const text = generatedVariations.join('\n');
+            copyTextToClipboard(text, `All ${generatedVariations.length} variations copied!`);
         }
 
-        /**
-         * Opens a modal and traps focus within it.
-         * @param {string} modalId - The ID of the modal to open.
-         * @param {HTMLElement | null} initialFocusElement - Optional element to focus initially inside the modal.
-         */
-        function openModal(modalId, initialFocusElement = null) {
-            // Only store last focused element if it's not the message box itself
-            if (modalId !== 'modalAccountMessageBox') {
-                lastFocusedElement = document.activeElement;
-            }
-            const modal = document.getElementById(modalId);
-            modal.classList.add('active');
+        function downloadTextList() {
+            if (generatedVariations.length === 0) return;
+            const text = generatedVariations.join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `namify_${document.getElementById('usernameInput').value || 'variations'}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Downloaded TXT file!");
+        }
 
-            // Get all focusable elements inside the modal
-            const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-            const firstFocusableElement = initialFocusElement || focusableElements[0];
-            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+        // ==============================================================
+        // 🔑 ACCOUNT DETAILS GENERATOR ENGINE (V0.16 Patterns)
+        // ==============================================================
+        function generateRealisticEmail(username) {
+            const domain = 'outlook.com';
+            const firstNames = ['james', 'john', 'robert', 'michael', 'william', 'david', 'richard', 'joseph', 
+                               'thomas', 'charles', 'mary', 'patricia', 'jennifer', 'linda', 'liz', 
+                               'barbara', 'susan', 'jessica', 'sarah', 'karen', 'alex', 'sam', 'chris', 'jordan',
+                               'daniel', 'matthew', 'anthony', 'mark', 'steven', 'paul', 'andrew',
+                               'joshua', 'kevin', 'brian', 'george', 'edward', 'ryan', 'jacob', 'eric',
+                               'emma', 'olivia', 'ava', 'sophia', 'bella', 'mia', 'emily', 'scarlett'];
+            
+            const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis',
+                              'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson',
+                              'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson',
+                              'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson', 'walker'];
 
-            // Focus the first element when modal opens
-            if (firstFocusableElement) {
-                firstFocusableElement.focus();
-            }
-
-            // Trap focus within the modal
-            modal.addEventListener('keydown', function(e) {
-                const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-
-                if (!isTabPressed) {
-                    return;
+            const patterns = [
+                () => {
+                    const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 999) + 100;
+                    return `${fn}.${ln}${num}`;
+                },
+                () => {
+                    const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const num = Math.floor(Math.random() * 9999) + 1000;
+                    return `${fn}${ln}${num}`;
+                },
+                () => {
+                    const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    const yr = Math.floor(Math.random() * 25) + 1998;
+                    const num = Math.floor(Math.random() * 99) + 1;
+                    return `${fn}_${ln}${yr}_${num}`;
+                },
+                () => {
+                    let clean = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (clean.length > 30) clean = clean.substring(0, 30);
+                    const n1 = Math.floor(Math.random() * 999) + 100;
+                    const n2 = Math.floor(Math.random() * 99) + 10;
+                    return `${clean}${n1}_${n2}`;
                 }
+            ];
 
-                if (e.shiftKey) { // if shift key pressed for shift + tab
-                    if (document.activeElement === firstFocusableElement) {
-                        lastFocusableElement.focus(); // move focus to the last focusable element
-                        e.preventDefault();
-                    }
-                } else { // if tab key pressed
-                    if (document.activeElement === lastFocusableElement) {
-                        firstFocusableElement.focus(); // move focus to the first focusable element
-                        e.preventDefault();
-                    }
-                }
-            });
+            const chosen = patterns[Math.floor(Math.random() * patterns.length)]();
+            return `${chosen}@${domain}`;
         }
 
-        /**
-         * Closes a modal and restores focus.
-         * @param {string} modalId - The ID of the modal to close.
-         */
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('active');
-            // Restore focus only if this is the modal that originally stored the last focused element
-            if (modalId !== 'modalAccountMessageBox' && lastFocusedElement) {
-                lastFocusedElement.focus();
-                lastFocusedElement = null; // Clear stored element
-            }
+        function generateSecurePassword(length = 14) {
+            const words = ['Star', 'Moon', 'Fire', 'Ice', 'Wind', 'Storm', 'Light', 'Dark', 'Sky', 'Ocean',
+                          'Tiger', 'Eagle', 'Wolf', 'Bear', 'Lion', 'Dragon', 'Phoenix', 'Hawk', 'Shark', 'Fox',
+                          'Blue', 'Red', 'Gold', 'Silver', 'Green', 'Black', 'White', 'Purple', 'Orange', 'Cyan'];
+            const adjectives = ['Quick', 'Smart', 'Strong', 'Brave', 'Bright', 'Swift', 'Bold', 'Wise', 'Cool', 'Epic'];
+            const specials = ['!', '@', '#', '$', '%', '&', '*'];
+
+            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const wrd = words[Math.floor(Math.random() * words.length)];
+            const num = Math.floor(Math.random() * 999) + 1;
+            const spc = specials[Math.floor(Math.random() * specials.length)];
+
+            return `${adj}${wrd}${num}${spc}`;
         }
 
-        /**
-         * Opens the updates modal.
-         */
-        function openUpdatesModal() {
-            openModal('updatesModal');
-        }
-
-        /**
-         * Closes the updates modal.
-         */
-        function closeUpdatesModal() {
-            closeModal('updatesModal');
-        }
-
-        /**
-         * Opens the make account modal with the selected username.
-         * @param {string} username - The username to pre-fill in the modal.
-         */
         function openMakeAccountModal(username) {
-            document.getElementById('modalUsernameInput').value = username;
-            document.getElementById('modalGeneratedEmail').value = ''; // Clear previous results
-            document.getElementById('modalGeneratedPassword').value = ''; // Clear previous results
-            openModal('makeAccountModal', document.getElementById('generateAccountDetailsButton'));
+            document.getElementById('modalUsernameInput').textContent = username;
+            document.getElementById('modalGeneratedEmail').value = '';
+            document.getElementById('modalGeneratedPassword').value = '';
+            
+            const modal = document.getElementById('makeAccountModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            generateAccountDetails(); // auto generate initial
         }
 
-        /**
-         * Closes the make account modal.
-         */
         function closeMakeAccountModal() {
-            closeModal('makeAccountModal');
+            const modal = document.getElementById('makeAccountModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
-        /**
-         * Simulates generating account details (email and password).
-         */
         function generateAccountDetails() {
-            const selectedUsername = document.getElementById('modalUsernameInput').value;
+            const username = document.getElementById('modalUsernameInput').textContent;
             const emailInput = document.getElementById('modalGeneratedEmail');
-            const passwordInput = document.getElementById('modalGeneratedPassword');
-            const generateButton = document.getElementById('generateAccountDetailsButton');
+            const pwdInput = document.getElementById('modalGeneratedPassword');
             const spinner = document.getElementById('modalLoadingSpinner');
-            const buttonText = document.getElementById('modalAccountButtonText');
+            const btnText = document.getElementById('modalAccountButtonText');
 
-            if (!selectedUsername) {
-                showMessageBox('Please select a username first.');
-                return;
-            }
+            spinner.classList.remove('hidden');
+            btnText.textContent = "Generating...";
 
-            // Show loading state
-            generateButton.disabled = true;
-            spinner.style.display = 'block';
-            buttonText.textContent = 'Generating...';
-            emailInput.value = '';
-            passwordInput.value = '';
-
-            // Simulate API call delay
             setTimeout(() => {
-                // Generate a realistic Outlook/Hotmail/Live email
-                const generatedEmail = generateRealisticEmail(selectedUsername);
+                const email = generateRealisticEmail(username);
+                const pwd = generateSecurePassword(14);
 
-                // Generate a secure but user-friendly password
-                const generatedPassword = generateSecurePassword(14); // 14 characters for good security
+                emailInput.value = email;
+                pwdInput.value = pwd;
 
-                emailInput.value = generatedEmail;
-                passwordInput.value = generatedPassword;
+                spinner.classList.add('hidden');
+                btnText.textContent = "Regenerate Identity Details";
 
-                // Send details to the Chrome extension
-                sendAccountDetailsToExtension({
-                    username: selectedUsername,
-                    email: generatedEmail,
-                    password: generatedPassword
-                });
+                // Chrome Extension postMessage support
+                window.parent.postMessage({
+                    type: 'NAMIFY_ACCOUNT_DETAILS',
+                    payload: { username, email, password: pwd }
+                }, '*');
 
-                // Hide loading state
-                generateButton.disabled = false;
-                spinner.style.display = 'none';
-                buttonText.textContent = 'Generate Account Details';
-
-                // After generating, show message box, but ensure focus returns to generate button
-                showMessageBox('Account details generated successfully!', document.getElementById('generateAccountDetailsButton'));
-            }, 1500); // Simulate 1.5 second API call
+                showToast("Identity generated & synced to extension!");
+            }, 300);
         }
 
-        /**
-         * Sends generated account details to the Chrome extension via window.postMessage.
-         * @param {object} details - Object containing username, email, and password.
-         */
-        function sendAccountDetailsToExtension(details) {
-            // Use a specific message type to avoid conflicts with other messages
-            window.parent.postMessage({
-                type: 'NAMIFY_ACCOUNT_DETAILS',
-                payload: details
-            }, '*'); // '*' allows communication with any origin. For production, specify your extension ID.
-        }
-
-        /**
-         * Shows a custom message box.
-         * @param {string} message - The message to display.
-         * @param {HTMLElement | null} focusElementOnClose - The element to focus after the message box closes.
-         */
-        function showMessageBox(message, focusElementOnClose = null) {
-            document.getElementById('modalAccountMessageContent').textContent = message;
-            const messageBox = document.getElementById('modalAccountMessageBox');
-            messageBox.classList.add('active');
-            // Store the element to focus on close for this specific message box
-            messageBox.focusElementOnClose = focusElementOnClose;
-
-            // Focus the OK button within the message box
-            const okButton = document.getElementById('closeModalAccountMessageBox');
-            if (okButton) {
-                okButton.focus();
-            }
-
-            // Trap focus within the message box
-            messageBox.addEventListener('keydown', function(e) {
-                const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-
-                if (!isTabPressed) {
-                    return;
-                }
-
-                const focusableElements = messageBox.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                const firstFocusableElement = focusableElements[0];
-                const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-                if (e.shiftKey) { // if shift key pressed for shift + tab
-                    if (document.activeElement === firstFocusableElement) {
-                        lastFocusableElement.focus(); // move focus to the last focusable element
-                        e.preventDefault();
-                    }
-                } else { // if tab key pressed
-                    if (document.activeElement === lastFocusableElement) {
-                        firstFocusableElement.focus(); // move focus to the first focusable element
-                        e.preventDefault();
-                    }
-                }
-            });
-        }
-
-        /**
-         * Closes the custom message box and restores focus.
-         */
-        function closeModalAccountMessageBox() {
-            const messageBox = document.getElementById('modalAccountMessageBox');
-            messageBox.classList.remove('active');
-            // Restore focus to the element specified when showMessageBox was called
-            if (messageBox.focusElementOnClose) {
-                messageBox.focusElementOnClose.focus();
-                messageBox.focusElementOnClose = null; // Clear the stored element
-            }
-        }
-
-        /**
-         * Opens the chatbot modal.
-         */
-        function openChatbotModal() {
-            openModal('chatbotModal', document.getElementById('chatInput'));
-            // Scroll to the bottom of the chat history when opened
-            const chatHistoryDiv = document.getElementById('chatHistory');
-            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-        }
-
-        /**
-         * Closes the chatbot modal.
-         */
-        function closeChatbotModal() {
-            closeModal('chatbotModal');
-        }
-
-        /**
-         * Sends a message to the Gemini API and displays the response.
-         */
-        async function sendMessageToGemini() {
-            const chatInput = document.getElementById('chatInput');
-            const chatHistoryDiv = document.getElementById('chatHistory');
-            const sendButton = document.getElementById('sendChatButton');
-            const chatSpinner = document.getElementById('chatSpinner');
-
-            const userMessage = chatInput.value.trim();
-            if (!userMessage) return;
-
-            // Display user message
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'chat-message user';
-            userMessageDiv.textContent = userMessage;
-            chatHistoryDiv.appendChild(userMessageDiv);
-
-            // Add to chat history for context
-            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
-
-            // Clear input and show loading
-            chatInput.value = '';
-            chatInput.disabled = true;
-            sendButton.disabled = true;
-            chatSpinner.style.display = 'block';
-            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom
-
-            try {
-                const payload = { contents: chatHistory };
-                // Your API key is now directly embedded here.
-                const apiKey = "AIzaSyCVBzAowZG51TA-iK9EfMisSwVqTYJQe3Q"; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                let geminiResponseText = "Sorry, I couldn't get a response. Please try again.";
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    geminiResponseText = result.candidates[0].content.parts[0].text;
-                }
-
-                // Display Gemini's response
-                const geminiMessageDiv = document.createElement('div');
-                geminiMessageDiv.className = 'chat-message gemini';
-                geminiMessageDiv.textContent = geminiResponseText;
-                chatHistoryDiv.appendChild(geminiMessageDiv);
-
-                // Add to chat history for context
-                chatHistory.push({ role: "model", parts: [{ text: geminiResponseText }] });
-
-            } catch (error) {
-                console.error('Error communicating with Gemini API:', error);
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.className = 'chat-message gemini';
-                errorMessageDiv.textContent = "Oops! Something went wrong. Please try sending your message again.";
-                chatHistoryDiv.appendChild(errorMessageDiv);
-            } finally {
-                // Hide loading and re-enable input
-                chatInput.disabled = false;
-                sendButton.disabled = false;
-                chatSpinner.style.display = 'none';
-                chatInput.focus(); // Return focus to input
-                chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight; // Scroll to bottom again
-            }
-        }
-
-        /**
-         * Downloads the generated account details as a PDF.
-         */
         function downloadAccountDetailsPdf() {
-            const username = document.getElementById('modalUsernameInput').value;
+            const username = document.getElementById('modalUsernameInput').textContent;
             const email = document.getElementById('modalGeneratedEmail').value;
             const password = document.getElementById('modalGeneratedPassword').value;
 
-            if (!username || !email || !password) {
-                showMessageBox('Please generate account details first before downloading the PDF.');
+            if (!email || !password) {
+                showToast("Generate account details first!");
                 return;
             }
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            doc.setFillColor(6, 7, 11);
+            doc.rect(0, 0, 210, 297, "F");
+
+            doc.setTextColor(0, 240, 255);
             doc.setFontSize(22);
-            doc.text("Namify Account Details", 105, 20, null, null, "center");
+            doc.text("NAMIFY IDENTITY VOUCHER", 105, 30, null, null, "center");
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.text("Generated: " + new Date().toLocaleString(), 105, 40, null, null, "center");
+
+            doc.setDrawColor(255, 255, 255);
+            doc.setLineWidth(0.2);
+            doc.line(20, 50, 190, 50);
 
             doc.setFontSize(12);
-            doc.text("Generated on: " + new Date().toLocaleString(), 105, 30, null, null, "center");
-
+            doc.setTextColor(150, 150, 150);
+            doc.text("CLOAKED USERNAME", 30, 70);
             doc.setFontSize(16);
-            doc.text("Username:", 20, 60);
+            doc.setTextColor(0, 240, 255);
+            doc.text(username, 30, 80);
+
+            doc.setFontSize(12);
+            doc.setTextColor(150, 150, 150);
+            doc.text("SIMULATED OUTLOOK EMAIL", 30, 105);
             doc.setFontSize(14);
-            doc.text(username, 20, 70);
+            doc.setTextColor(255, 255, 255);
+            doc.text(email, 30, 115);
 
-            doc.setFontSize(16);
-            doc.text("Email:", 20, 90);
+            doc.setFontSize(12);
+            doc.setTextColor(150, 150, 150);
+            doc.text("GENERATED SECURE PASSWORD", 30, 140);
             doc.setFontSize(14);
-            doc.text(email, 20, 100);
+            doc.setTextColor(255, 255, 255);
+            doc.text(password, 30, 150);
 
-            doc.setFontSize(16);
-            doc.text("Password:", 20, 120);
-            doc.setFontSize(14);
-            doc.text(password, 20, 130);
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Generated via Namify v0.17 • Keep credentials secure.", 105, 200, null, null, "center");
 
-            doc.setFontSize(10);
-            doc.text("Please keep these details secure. This PDF is for your convenience.", 105, 160, null, null, "center");
-            doc.text("This is a simulated account generation and does not create a real account.", 105, 170, null, null, "center");
-
-
-            doc.save(`Namify_Account_Details_${username}.pdf`);
-            showMessageBox('PDF downloaded successfully!');
+            doc.save(`Namify_${username}.pdf`);
+            showToast("PDF exported successfully!");
         }
 
+        // ==============================================================
+        // 💬 GEMINI AI CHATBOT LOGIC
+        // ==============================================================
+        function openChatbotModal() {
+            const modal = document.getElementById('chatbotModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('chatInput').focus();
+        }
 
-        // Particle System Logic
+        function closeChatbotModal() {
+            const modal = document.getElementById('chatbotModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function sendQuickPrompt(prompt) {
+            document.getElementById('chatInput').value = prompt;
+            sendMessageToGemini();
+        }
+
+        async function sendMessageToGemini() {
+            const input = document.getElementById('chatInput');
+            const history = document.getElementById('chatHistory');
+            const btn = document.getElementById('sendChatButton');
+            const spinner = document.getElementById('chatSpinner');
+
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Append User message
+            const userMsg = document.createElement('div');
+            userMsg.className = "p-3 rounded-2xl bg-brand-cyan/20 border border-brand-cyan/30 text-white ml-auto max-w-[85%]";
+            userMsg.textContent = text;
+            history.appendChild(userMsg);
+            chatHistory.push({ role: "user", parts: [{ text }] });
+
+            input.value = '';
+            input.disabled = true;
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                const apiKey = "AIzaSyCVBzAowZG51TA-iK9EfMisSwVqTYJQe3Q";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: chatHistory })
+                });
+
+                const data = await response.json();
+                let reply = "Sorry, I couldn't reach the stars right now. Please try again.";
+                if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                    reply = data.candidates[0].content.parts[0].text;
+                }
+
+                const aiMsg = document.createElement('div');
+                aiMsg.className = "p-3 rounded-2xl bg-white/[0.04] border border-white/5 text-white/90 max-w-[85%]";
+                aiMsg.textContent = reply;
+                history.appendChild(aiMsg);
+                chatHistory.push({ role: "model", parts: [{ text: reply }] });
+
+            } catch (err) {
+                const errMsg = document.createElement('div');
+                errMsg.className = "p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 max-w-[85%]";
+                errMsg.textContent = "Error connecting to AI service. Please check your connection.";
+                history.appendChild(errMsg);
+            } finally {
+                input.disabled = false;
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                input.focus();
+                history.scrollTop = history.scrollHeight;
+            }
+        }
+
+        // ==============================================================
+        // 📜 CHANGELOG MODAL
+        // ==============================================================
+        function openUpdatesModal() {
+            const modal = document.getElementById('updatesModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeUpdatesModal() {
+            const modal = document.getElementById('updatesModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ==============================================================
+        // 🌌 PARTICLES & STARFIELD CANVAS
+        // ==============================================================
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        const maxParticles = 100; // Number of particles
 
-        // Particle class
         class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.radius = Math.random() * 1.5 + 0.5; // Small particles
-                this.opacity = Math.random() * 0.7 + 0.3; // Varying opacity
-                this.velocity = {
-                    x: (Math.random() - 0.5) * 0.3, // Slow horizontal movement
-                    y: (Math.random() - 0.5) * 0.3  // Slow vertical movement
-                };
-                this.life = 0;
-                this.maxLife = Math.random() * 100 + 100; // How long particle lives
+            constructor(w, h) {
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
+                this.radius = Math.random() * 1.2 + 0.3;
+                this.baseAlpha = Math.random() * 0.6 + 0.2;
+                this.alpha = this.baseAlpha;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.005;
             }
-
-            draw() {
+            update(w, h) {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = w;
+                if (this.x > w) this.x = 0;
+                if (this.y < 0) this.y = h;
+                if (this.y > h) this.y = 0;
+                this.alpha = this.baseAlpha + Math.sin(Date.now() * this.pulseSpeed) * 0.2;
+            }
+            draw(ctx) {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 240, 255, ${Math.max(0, this.alpha)})`;
                 ctx.fill();
             }
-
-            update() {
-                this.x += this.velocity.x;
-                this.y += this.velocity.y;
-                this.life++;
-                this.opacity = 1 - (this.life / this.maxLife); // Fade out over time
-            }
         }
 
-        /**
-         * Initializes particles.
-         */
         function initParticles() {
-            particles = [];
-            for (let i = 0; i < maxParticles; i++) {
-                // Spawn particles randomly across the canvas
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                particles.push(new Particle(x, y));
-            }
-        }
-
-        /**
-         * Animation loop for particles.
-         */
-        function animateParticles() {
-            requestAnimationFrame(animateParticles);
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                p.update();
-                p.draw();
-
-                // If particle is dead or out of bounds, remove and replace
-                if (p.life >= p.maxLife || p.opacity <= 0 || p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
-                    particles.splice(i, 1);
-                    // Add a new particle at a random position
-                    const x = Math.random() * canvas.width;
-                    const y = Math.random() * canvas.height;
-                    particles.push(new Particle(x, y));
-                    i--; // Adjust index after splice
-                }
-            }
-        }
-
-        /**
-         * Resizes the canvas to fill the window.
-         */
-        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            initParticles(); // Re-initialize particles on resize to fill new dimensions
+            particles = [];
+            const count = Math.min(Math.floor(window.innerWidth / 12), 120);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(canvas.width, canvas.height));
+            }
         }
 
-        // Event listeners for input field UI updates
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update(canvas.width, canvas.height);
+                p.draw(ctx);
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Setup Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            const usernameInput = document.getElementById('usernameInput');
-            usernameInput.addEventListener('input', updateInputUI);
-            updateInputUI(); // Initial call to set counter and clear button state
+            const input = document.getElementById('usernameInput');
+            input.addEventListener('input', updateInputUI);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') generateHomoglyphs();
+            });
 
-            // Initially hide the "Copy All" button
-            document.getElementById('copyAllButton').style.display = 'none';
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessageToGemini();
+            });
 
-            // Event listener for sending chat message on Enter key press
-            document.getElementById('chatInput').addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    sendMessageToGemini();
+            // Close modals on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeMakeAccountModal();
+                    closeUpdatesModal();
+                    closeChatbotModal();
                 }
             });
 
-            // Initialize and start particle animation
-            resizeCanvas(); // Set initial canvas size and populate particles
-            window.addEventListener('resize', resizeCanvas); // Adjust canvas size on window resize
-            animateParticles(); // Start the animation loop
+            initParticles();
+            window.addEventListener('resize', initParticles);
+            animateParticles();
         });
     </script>
 </body>
